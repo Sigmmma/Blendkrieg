@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+### Our additions:
+
+# Include the init file in mek_lib but exclude the mek_lib.
+!mek_lib/
+mek_lib/*
+!mek_lib/__init__.py
