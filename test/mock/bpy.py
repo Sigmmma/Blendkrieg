@@ -42,7 +42,10 @@ def set_scene_data(nested):
 def _add_objects(nested, parent=None):
 	for name in nested:
 		obj = Object(name)
-		obj.parent = parent
+
+		if parent:
+			obj.parent = parent
+			parent.children.append(obj)
 
 		children = nested[name].get('children')
 		if children:

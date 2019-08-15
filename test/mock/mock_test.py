@@ -26,20 +26,24 @@ def blenderMockTests():
 		bpy.set_scene_data({
 			'Parent': {
 				'children': {
-					'child': {},
+					'child1': {},
+					'child2': {}
 				}
 			}
 		})
 
-		child = bpy.data.objects.get('child')
-		assert_that(child, not_none(), 'Child is added')
-		assert_that(child.name, equal_to('child'), 'Child name is set')
-
 		parent = bpy.data.objects.get('Parent')
-		assert_that(child.parent, not_none(), 'Child has parent set')
-		assert_that(child.parent, equal_to(parent), 'Child has correct parent')
 
-#	@it('Child objects have parent set')
+		for i in range(1, 3):
+			name = 'child' + str(i)
+			child = bpy.data.objects.get(name)
+
+			assert_that(parent.children, has_item(child), 'Parent has child')
+			assert_that(child, not_none(), 'Child is added')
+			assert_that(child.name, equal_to(name), 'Child name is set')
+			assert_that(child.parent, not_none(), 'Child has parent set')
+			assert_that(child.parent, equal_to(parent), 'Child has correct parent')
+
 #	@it('Collections created by name')
 #	@it('All children added to collection')
 #	@it('Object can belong to multiple collections')
