@@ -25,5 +25,16 @@ class Object:
 	def __init__(self, name, collection=None):
 		pass
 
+is_mock = True # Allows tests to verify they're using the mocks
 data = Data()
+
+def clear_mock():
+	'''Removes any data in the mock'''
+	data = Data()
+
+def set_scene_data(nested):
+	'''Uses a nested dictionary to create all of the objects in the scene.
+	Collections are created by name. Parents are inferred from dict structure.
+	'''
+	pass
 
