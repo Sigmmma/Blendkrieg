@@ -10,20 +10,21 @@ bl_info = {
     "category": "Import-Export"
     }
 
+from .menu import topbar_dropdown
 
 def register():
     '''
     Registers classes on load by calling the
     register functions in their respective modules.
     '''
-    pass
+    topbar_dropdown.register()
 
 def unregister():
     '''
     Unregisters classes on unload by calling the
     unregister functions in their respective modules.
     '''
-    pass
+    topbar_dropdown.unregister()
 
 if __name__ == "__main__":
     register()
