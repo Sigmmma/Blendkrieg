@@ -54,8 +54,6 @@ classes = (
     TOPBAR_MT_krieg_export,
 )
 
-# When appended to another menu class
-# this will execute after the built in draw()
 def draw_krieg_button(self, context):
     '''
     When appended to another menu class this
@@ -73,7 +71,7 @@ def register():
 def unregister():
     TOPBAR_MT_editor_menus.remove(draw_krieg_button)
 
-    for cls in reversed(classes):
+    for cls in reversed(classes): #Reversed because: first in, last out.
         unregister_class(cls)
 
 
