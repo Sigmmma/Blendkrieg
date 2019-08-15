@@ -1,38 +1,41 @@
 bl_info = {
     "name": "Blendkrieg",
-    "author": "Multiple Authors",
+    "author": "gbMichelle & Mimickal",
     "version": (0, 0, 1),
     "blender": (2, 80, 0),
-    "location": "File > Import-Export",
-    "description": "Add Halo CE importers and exporters",
+    "location": "Top-Bar > Krieg",
+    "description": "Adds Halo importers, exporters, and Helper tools.",
     "warning": "",
-    "wiki_url": "https://github.com/gbMichelle/Blendkrieg/branches",
+    "wiki_url": "https://github.com/gbMichelle/Blendkrieg/wiki",
     "category": "Import-Export"
     }
 
+from bpy.utils import register_class, unregister_class
+
+### Import all the modules or reload them if they are already loaded.
 if "bpy" in locals():
     import importlib
-    pass  # reload the addons to register/unregister
+    pass
+#    importlib.reload(example_module)
 else:
-    pass  # import the addons to register/unregister
+    pass
+#    from . import example_module
 
 import bpy
 
-# Register
-classes = [
-]
-
 def register():
-    from bpy.utils import register_class
-    for cls in classes:
-        register_class(cls)
-
+    '''
+    Registers classes on load by calling the
+    register functions in their respective modules.
+    '''
+    pass
 
 def unregister():
-    from bpy.utils import unregister_class
-    for cls in reversed(classes):
-        unregister_class(cls)
-
+    '''
+    Unregisters classes on unload by calling the
+    unregister functions in their respective modules.
+    '''
+    pass
 
 if __name__ == "__main__":
     register()
