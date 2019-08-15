@@ -14,6 +14,7 @@ class Data:
 
 class Collection:
 	children = dict() # All sub-collections in this collection
+	name = None       # Name as it appears in Outliner
 	objects = dict()  # All objects in this collection
 
 class Object:
@@ -45,6 +46,13 @@ def _add_objects(nested, parent=None):
 		if parent:
 			obj.parent = parent
 			parent.children.append(obj)
+
+		for coll_name in nested[name].get('collections', {}):
+			coll_obj = data.collections.get(coll_name, Collection())
+			coll_obj.name = coll_name
+			coll_obj.objects[name] = obj
+			data.collections[coll_name] = coll_obj
+			obj.users_collection.append(coll_obj)
 
 		children = nested[name].get('children')
 		if children:

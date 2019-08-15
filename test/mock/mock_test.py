@@ -44,6 +44,30 @@ def blenderMockTests():
 			assert_that(child.parent, not_none(), 'Child has parent set')
 			assert_that(child.parent, equal_to(parent), 'Child has correct parent')
 
-#	@it('Collections created by name')
+	@it('Collections created and populated by name')
+	def collectionsCreatedByName():
+		bpy.set_scene_data({
+			'obj1': {
+				'collections': ['coll1']
+			},
+			'obj2': {
+				'collections': ['coll1']
+			},
+		})
+
+		coll = bpy.data.collections.get('coll1')
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		assert_that(coll, not_none(), 'Collection is added')
+		assert_that(coll.name, equal_to('coll1'), 'Collection has correct name')
+		assert_that(coll.objects, has_entry('obj1', obj1), 'Collection has obj1')
+		assert_that(coll.objects, has_entry('obj2', obj2), 'Collection has obj2')
+
+		assert_that(obj1.users_collection, has_item(coll), 'obj1 has the collection')
+		assert_that(obj2.users_collection, has_item(coll), 'obj2 has the collection')
+
 #	@it('All children added to collection')
 #	@it('Object can belong to multiple collections')
+#	@it('Collections can have nested sub-collections')
+
