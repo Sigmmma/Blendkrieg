@@ -1,4 +1,5 @@
-from bpy.types import Menu
+from bpy.utils import register_class, unregister_class
+from bpy.types import Menu, TOPBAR_MT_editor_menus
 
 class TOPBAR_MT_krieg(Menu):
     bl_idname = "TOPBAR_MT_krieg_ext"
@@ -64,18 +65,12 @@ def draw_krieg_button(self, context):
     self.layout.menu(TOPBAR_MT_krieg.bl_idname, text=TOPBAR_MT_krieg.bl_label)
 
 def register():
-    from bpy.utils import register_class
-    from bpy.types import TOPBAR_MT_editor_menus
-
     for cls in classes:
         register_class(cls)
 
     TOPBAR_MT_editor_menus.append(draw_krieg_button)
 
 def unregister():
-    from bpy.utils import unregister_class
-    from bpy.types import TOPBAR_MT_editor_menus
-
     TOPBAR_MT_editor_menus.remove(draw_krieg_button)
 
     for cls in reversed(classes):
