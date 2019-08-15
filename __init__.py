@@ -10,16 +10,6 @@ bl_info = {
     "category": "Import-Export"
     }
 
-### Import all the modules or reload them if they are already loaded.
-if "bpy" in locals():
-    import importlib
-    pass
-#    importlib.reload(example_module)
-else:
-    pass
-#    from . import example_module
-
-import bpy
 
 def register():
     '''
