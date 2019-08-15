@@ -10,8 +10,6 @@ bl_info = {
     "category": "Import-Export"
     }
 
-from bpy.utils import register_class, unregister_class
-
 ### Import all the modules or reload them if they are already loaded.
 if "bpy" in locals():
     import importlib
