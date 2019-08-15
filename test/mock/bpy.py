@@ -36,6 +36,17 @@ def set_scene_data(nested):
 	'''Uses a nested dictionary to create all of the objects in the scene.
 	Collections are created by name. Parents are inferred from dict structure.
 	'''
+	_add_objects(nested)
+
+# Yeah, we're using recursion. Sue me
+def _add_objects(nested, parent=None):
 	for name in nested:
-		data.objects[name] = Object(name)
+		obj = Object(name)
+		obj.parent = parent
+
+		children = nested[name].get('children')
+		if children:
+			_add_objects(children, parent=obj)
+
+		data.objects[name] = obj
 

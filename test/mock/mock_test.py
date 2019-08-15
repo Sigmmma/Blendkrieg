@@ -18,10 +18,27 @@ def blenderMockTests():
 		})
 
 		my_obj = bpy.data.objects.get('MyObject')
-		assert_that(my_obj, not_none())
-		assert_that(my_obj.name, equal_to('MyObject'))
+		assert_that(my_obj, not_none(), 'Object is added')
+		assert_that(my_obj.name, equal_to('MyObject'), 'Object name is set')
 
-#	@it('Objects can have children')
+	@it('Setting an object with children')
+	def objectWithChildrenSet():
+		bpy.set_scene_data({
+			'Parent': {
+				'children': {
+					'child': {},
+				}
+			}
+		})
+
+		child = bpy.data.objects.get('child')
+		assert_that(child, not_none(), 'Child is added')
+		assert_that(child.name, equal_to('child'), 'Child name is set')
+
+		parent = bpy.data.objects.get('Parent')
+		assert_that(child.parent, not_none(), 'Child has parent set')
+		assert_that(child.parent, equal_to(parent), 'Child has correct parent')
+
 #	@it('Child objects have parent set')
 #	@it('Collections created by name')
 #	@it('All children added to collection')
