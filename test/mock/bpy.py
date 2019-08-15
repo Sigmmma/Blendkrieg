@@ -22,14 +22,12 @@ class Object:
 	parent = None             # The object this object is parented to
 	users_collection = list() # All the collections this object belongs to
 
-	def __init__(self, name):
-		self.name = name
 
 is_mock = True # Allows tests to verify they're using the mocks
 data = Data()
 
+
 def clear_mock():
-	'''Removes any data in the mock'''
 	data = Data()
 
 def set_scene_data(nested):
@@ -41,7 +39,8 @@ def set_scene_data(nested):
 # Yeah, we're using recursion. Sue me
 def _add_objects(nested, parent=None):
 	for name in nested:
-		obj = Object(name)
+		obj = Object()
+		obj.name = name
 
 		if parent:
 			obj.parent = parent
