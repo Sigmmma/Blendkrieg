@@ -22,8 +22,8 @@ class Object:
 	parent = None             # The object this object is parented to
 	users_collection = list() # All the collections this object belongs to
 
-	def __init__(self, name, collection=None):
-		pass
+	def __init__(self, name):
+		self.name = name
 
 is_mock = True # Allows tests to verify they're using the mocks
 data = Data()
@@ -36,5 +36,6 @@ def set_scene_data(nested):
 	'''Uses a nested dictionary to create all of the objects in the scene.
 	Collections are created by name. Parents are inferred from dict structure.
 	'''
-	pass
+	for name in nested:
+		data.objects[name] = Object(name)
 
