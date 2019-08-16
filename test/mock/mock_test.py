@@ -9,12 +9,9 @@ def blenderMockTests():
 
 	@beforeEach
 	def verifyEmpty():
+		bpy.clear_mock()
 		assert_that(bpy.data.objects, empty())
 		assert_that(bpy.data.collections, empty())
-
-	@afterEach
-	def cleanup():
-		bpy.clear_mock()
 
 	@it('Setting and retrieving single object')
 	def singleObjectSet():
