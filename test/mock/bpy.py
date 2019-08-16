@@ -8,20 +8,23 @@
 # This should, in theory, be a drop-in replacement for testing.
 
 class Data:
-	collections = dict() # All the collections in the scene
-	meshes = dict()      # All the mesh objects in the scene
-	objects = dict()     # All the objects in the scene
+	def __init__(self):
+		self.collections = dict() # All the collections in the scene
+		self.meshes = dict()      # All the mesh objects in the scene
+		self.objects = dict()     # All the objects in the scene
 
 class Collection:
-	children = dict() # All sub-collections in this collection
-	name = None       # Name as it appears in Outliner
-	objects = dict()  # All objects in this collection
+	def __init__(self):
+		self.children = dict() # All sub-collections in this collection
+		self.name = None       # Name as it appears in Outliner
+		self.objects = dict()  # All objects in this collection
 
 class Object:
-	children = list()         # Objects parented to this object
-	name = None               # Name as it appears in Outliner
-	parent = None             # The object this object is parented to
-	users_collection = list() # All the collections this object belongs to
+	def __init__(self):
+		self.children = list()         # Objects parented to this object
+		self.name = None               # Name as it appears in Outliner
+		self.parent = None             # The object this object is parented to
+		self.users_collection = set()  # All the collections this object belongs to
 
 
 is_mock = True # Allows tests to verify they're using the mocks
@@ -29,7 +32,9 @@ data = Data()
 
 
 def clear_mock():
-	data = Data()
+	data.collections.clear()
+	data.meshes.clear()
+	data.objects.clear()
 
 def set_scene_data(nested):
 	'''Uses a nested dictionary to create all of the objects in the scene.

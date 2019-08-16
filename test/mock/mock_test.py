@@ -7,6 +7,11 @@ assert_that(bpy.is_mock, equal_to(True))
 @describe('Blender mock tests')
 def blenderMockTests():
 
+	@beforeEach
+	def verifyEmpty():
+		assert_that(bpy.data.objects, empty())
+		assert_that(bpy.data.collections, empty())
+
 	@afterEach
 	def cleanup():
 		bpy.clear_mock()
