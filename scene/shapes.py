@@ -22,7 +22,7 @@ def create_sphere(name="new_sphere", size=1):
 
     return sphere
 
-def create_node_object(name="new_cone", base_size=1, height=3):
+def create_cone(name="new_cone", base_size=1, height=3):
     '''
     Creates a cone with the given sizes.
     '''
