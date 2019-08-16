@@ -43,7 +43,7 @@ def set_scene_data(nested):
 	_add_objects(nested)
 
 # Yeah, we're using recursion. Sue me
-def _add_objects(nested, parent=None):
+def _add_objects(nested, parent=None, collections=[]):
 	for name in nested:
 		obj = Object()
 		obj.name = name
@@ -52,16 +52,19 @@ def _add_objects(nested, parent=None):
 			obj.parent = parent
 			parent.children.append(obj)
 
-		for coll_name in nested[name].get('collections', {}):
+		# Remove any repeated collection names
+		all_collections = list(set(nested[name].get('collections', []) + collections))
+
+		for coll_name in all_collections:
 			coll_obj = data.collections.get(coll_name, Collection())
 			coll_obj.name = coll_name
 			coll_obj.objects[name] = obj
 			data.collections[coll_name] = coll_obj
-			obj.users_collection.append(coll_obj)
+			obj.users_collection.add(coll_obj)
 
 		children = nested[name].get('children')
 		if children:
-			_add_objects(children, parent=obj)
+			_add_objects(children, parent=obj, collections=all_collections)
 
 		data.objects[name] = obj
 

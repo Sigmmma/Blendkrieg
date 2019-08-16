@@ -72,7 +72,43 @@ def blenderMockTests():
 		assert_that(obj1.users_collection, has_item(coll), 'obj1 has the collection')
 		assert_that(obj2.users_collection, has_item(coll), 'obj2 has the collection')
 
-#	@it('All children added to collection')
-#	@it('Object can belong to multiple collections')
+	@it('All children added to parent\'s collection')
+	def childrenAddedToParentsCollection():
+		bpy.set_scene_data({
+			'Parent': {
+				'collections': ['coll1'],
+				'children': {
+					'child1': {
+						'collections': ['coll2']
+					},
+					'child2': {}
+				}
+			}
+		})
+
+		parent = bpy.data.objects.get('Parent')
+		child1 = bpy.data.objects.get('child1')
+		child2 = bpy.data.objects.get('child2')
+		coll1 = bpy.data.collections.get('coll1')
+		coll2 = bpy.data.collections.get('coll2')
+
+		assert_that(coll1.objects, has_entries('child1', child1, 'child2', child2),
+			'Both children added to parent\'s collection')
+
+		assert_that(coll2, not_none(), 'Child1\'s collection was created')
+		assert_that(coll2.name, equal_to('coll2'),
+			'Child1\'s collection has correct name')
+		assert_that(coll2.objects, has_entry('child1', child1),
+			'Child1 belongs to its collection')
+		assert_that(coll2.objects, not_(has_entry('child2', child2)),
+			'Child2 not in Child1\'s collection')
+
+		assert_that(child1.users_collection, has_items(coll1, coll2),
+			'Child1 has its and its parent\'s collections')
+		assert_that(child2.users_collection, has_item(coll1),
+			'Child2 has its parent\'s collection')
+		assert_that(child2.users_collection, not_(has_item(coll2)),
+			'Child2 does not have Child1\'s collection')
+
 #	@it('Collections can have nested sub-collections')
 
