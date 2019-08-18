@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 
-def create_sphere(name="new_sphere", size=1):
+def create_sphere(name="new_sphere", size=1.0):
     '''
     Creates a sphere with the given size.
     '''
@@ -22,7 +22,7 @@ def create_sphere(name="new_sphere", size=1):
 
     return sphere
 
-def create_cone(name="new_cone", base_size=1, height=3):
+def create_cone(name="new_cone", base_size=1.0, height=3.0):
     '''
     Creates a cone with the given sizes.
     '''
