@@ -43,7 +43,7 @@ def set_scene_data(nested):
 	_add_objects(nested)
 
 # Yeah, we're using recursion. Sue me
-def _add_objects(nested, parent=None, collections=[]):
+def _add_objects(nested, parent=None, parent_colls=set()):
 	for name in nested:
 		obj = Object()
 		obj.name = name
@@ -52,19 +52,30 @@ def _add_objects(nested, parent=None, collections=[]):
 			obj.parent = parent
 			parent.children.append(obj)
 
-		# Remove any repeated collection names
-		all_collections = list(set(nested[name].get('collections', []) + collections))
+		# Create any new collections
+		child_colls = set()
+		for coll_name in nested[name].get('collections', set()):
+			coll = data.collections.get(coll_name)
+			if coll is None:
+				coll = Collection()
+				coll.name = coll_name
+				data.collections[coll_name] = coll
+			child_colls.add(coll)
 
-		for coll_name in all_collections:
-			coll_obj = data.collections.get(coll_name, Collection())
-			coll_obj.name = coll_name
-			coll_obj.objects[name] = obj
-			data.collections[coll_name] = coll_obj
-			obj.users_collection.add(coll_obj)
+		# Add all child collections as children of parent collections
+		for p_coll in parent_colls:
+			for c_coll in child_colls:
+				p_coll.children[c_coll.name] = c_coll
+
+		# Set up associations between object and all relevant collections
+		all_colls = child_colls | parent_colls
+		for coll in all_colls:
+			obj.users_collection.add(coll)
+			coll.objects[name] = obj
 
 		children = nested[name].get('children')
 		if children:
-			_add_objects(children, parent=obj, collections=all_collections)
+			_add_objects(children, parent=obj, parent_colls=all_colls)
 
 		data.objects[name] = obj
 
