@@ -8,7 +8,7 @@ bl_info = {
 	"warning": "",
 	"wiki_url": "https://github.com/gbMichelle/Blendkrieg/wiki",
 	"category": "Import-Export"
-	}
+}
 
 from .menu import topbar_dropdown
 
