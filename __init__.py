@@ -10,7 +10,12 @@ bl_info = {
 	"category": "Import-Export"
 }
 
-from .menu import topbar_dropdown
+# Make the BlendKrieg folder recognized as a module
+# so that we can import things more easily.
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
 
 def register():
 	'''
