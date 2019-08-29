@@ -1,7 +1,7 @@
 from bpy.utils import register_class, unregister_class
 from bpy.types import Menu, TOPBAR_MT_editor_menus
 
-from menu.import_export import halo1_model
+from .import_export import halo1_model
 
 class TOPBAR_MT_krieg(Menu):
 	bl_idname = "TOPBAR_MT_krieg_ext"

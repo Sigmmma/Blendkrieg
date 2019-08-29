@@ -10,15 +10,9 @@ bl_info = {
 	"category": "Import-Export"
 }
 
-# Make the BlendKrieg folder recognized as a module
-# so that we can import things more easily.
-import sys
-import os
-sys.path.insert(0, os.path.dirname(__file__))
-
 # Import all submodules.
-from menu import topbar_dropdown
-from menu.import_export import halo1_model
+from .menu import topbar_dropdown
+from .menu.import_export import halo1_model
 
 def register():
 	'''
