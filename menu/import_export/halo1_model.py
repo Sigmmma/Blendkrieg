@@ -5,7 +5,11 @@ from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, 
 
 #@orientation_helper(axis_forward='-Z') Find the right value for this.
 class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
-	"""Load a Gbxmodel or jms file."""
+	"""
+	The import operator for gbxmodel/jms models.
+	This stores the properties when inside of the import dialog, and
+	it specifies what to show on the side panel when importing.
+	"""
 	bl_idname = "import_scene.halo1_model"
 	bl_label = "Import Halo 1 Model"
 	bl_options = {'PRESET', 'UNDO'}
