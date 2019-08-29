@@ -106,7 +106,7 @@ venv.bak/
 
 ### Our additions:
 
-# Include the init file in mek_lib but exclude the mek_lib.
-!mek_lib/
-mek_lib/*
-!mek_lib/__init__.py
+# Include the init file in lib but exclude the lib folder.
+!lib/
+lib/*
+!lib/__init__.py
