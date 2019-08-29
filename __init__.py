@@ -16,12 +16,16 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
 
+# Import all submodules.
+from menu import topbar_dropdown
+from menu.import_export import halo1_model
 
 def register():
 	'''
 	Registers classes on load by calling the
 	register functions in their respective modules.
 	'''
+	halo1_model.register()
 	topbar_dropdown.register()
 
 def unregister():
@@ -30,6 +34,7 @@ def unregister():
 	unregister functions in their respective modules.
 	'''
 	topbar_dropdown.unregister()
+	halo1_model.register()
 
 if __name__ == "__main__":
 	register()
