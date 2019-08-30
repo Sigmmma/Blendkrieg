@@ -60,12 +60,12 @@ def import_halo1_nodes(jms):
 		if node.parent_index >= 0:
 			scene_node.parent = scene_nodes[node.parent_index]
 
+		# TODO: Get proper position and rotation using Keanu Reeves math
 		# Set the translations
 		scene_node.rotation_mode = 'QUATERNION'
 		scene_node.rotation_quaternion = (
 			node.rot_w, node.rot_i, node.rot_j, node.rot_k
 		)
-		# TODO: Get proper position using Keanu Reeves math
 		# Undo 100x scaling from jms files.
 		scene_node.location = (node.pos_x/100, node.pos_y/100, node.pos_z/100)
 
