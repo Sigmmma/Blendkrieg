@@ -47,28 +47,34 @@ def read_halo1model(filepath):
 
 		return jms
 
-def import_halo1_nodes(jms):
+def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a list of them.
 	'''
+	# Jms are scaled at x100 halo. Undo that.
+	scale = scale/100
+
 	scene_nodes = []
 	for node in jms.nodes:
-		scene_node = create_sphere(name=node.name, size=0.02)
+		scene_node = create_sphere(name=node.name, size=node_size)
 
 		# Assign parent if index is valid.
-		if node.parent_index >= 0:
+		if node.parent_index in range(len(scene_nodes)):
 			scene_node.parent = scene_nodes[node.parent_index]
+			print(scene_node.parent)
 
-		# TODO: Get proper position and rotation using Keanu Reeves math
-		# Set the translations
+		# Store original rotation mode.
+		rot_mode = scene_node.rotation_mode
+		# Set rotation mode to quaternion and apply the rotation.
 		scene_node.rotation_mode = 'QUATERNION'
 		scene_node.rotation_quaternion = (
 			node.rot_w, node.rot_i, node.rot_j, node.rot_k
 		)
+		# Set rotation mode back.
+		scene_node.rotation_mode = rot_mode
+
 		# Undo 100x scaling from jms files.
-		scene_node.location = (node.pos_x/100, node.pos_y/100, node.pos_z/100)
-
-
+		scene_node.location = (node.pos_x/scale, node.pos_y/scale, node.pos_z/scale)
 
 		scene_nodes.append(scene_node)
 
