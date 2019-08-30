@@ -40,7 +40,7 @@ def read_halo1model(filepath):
 		with open(filepath, 'r') as jms_file:
 			jms_string = jms_file.read()
 		# Read Jms data from string.
-		jms = read_jms(jms_string, write_jms=False)
+		jms = read_jms(jms_string)
 		# Make sure it's a Halo 1 jms
 		assert(jms.version == "8200")
 
