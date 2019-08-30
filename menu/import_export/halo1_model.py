@@ -3,6 +3,8 @@ from bpy.utils import register_class, unregister_class
 from bpy.props import BoolProperty, FloatProperty, StringProperty, EnumProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, path_reference_mode, axis_conversion
 
+from ...halo1.model import read_halo1model, import_halo1_nodes
+
 #@orientation_helper(axis_forward='-Z') Find the right value for this.
 class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 	"""
@@ -57,6 +59,13 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		print("Use armatures: " + str(self.use_armatures))
 		print("Scale Enum: " + str(self.scale_enum))
 		print("Scale Float: " + str(self.scale_float))
+
+		# Test if jms import function doesn't crash.
+		jms = read_halo1model(self.filepath)
+
+		# Import nodes into the scene.
+		import_halo1_nodes(jms)
+
 		return {'FINISHED'}
 
 	def draw(self, context):
