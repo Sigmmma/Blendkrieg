@@ -2,11 +2,10 @@ import bpy
 
 import os
 
-# TODO: Figure out why I can't import these without ..lib.
-from ..lib.reclaimer.hek.defs.mode import mode_def
-from ..lib.reclaimer.hek.defs.mod2 import mod2_def
-from ..lib.reclaimer.model.jms import read_jms
-from ..lib.reclaimer.model.model_decompilation import extract_model
+from reclaimer.hek.defs.mode import mode_def
+from reclaimer.hek.defs.mod2 import mod2_def
+from reclaimer.model.jms import read_jms
+from reclaimer.model.model_decompilation import extract_model
 
 from ..scene.shapes import create_sphere
 

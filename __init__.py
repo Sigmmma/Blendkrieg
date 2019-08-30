@@ -10,6 +10,9 @@ bl_info = {
 	"category": "Import-Export"
 }
 
+# Initialize the libraries module.
+from . import lib
+
 # Import all submodules.
 from .menu import topbar_dropdown
 from .menu.import_export import halo1_model
