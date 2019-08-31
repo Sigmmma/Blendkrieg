@@ -64,7 +64,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		jms = read_halo1model(self.filepath)
 
 		# Import nodes into the scene.
-		import_halo1_nodes(jms)
+		nodes = import_halo1_nodes(jms)
 
 		return {'FINISHED'}
 
