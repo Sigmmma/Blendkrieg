@@ -74,7 +74,7 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 		scene_node.rotation_mode = rot_mode
 
 		# Undo 100x scaling from jms files.
-		scene_node.location = (node.pos_x/scale, node.pos_y/scale, node.pos_z/scale)
+		scene_node.location = (node.pos_x*scale, node.pos_y*scale, node.pos_z*scale)
 
 		scene_nodes.append(scene_node)
 
