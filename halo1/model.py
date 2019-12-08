@@ -8,7 +8,7 @@ from reclaimer.model.model_decompilation import extract_model
 from ..scene.shapes import create_sphere
 
 def read_halo1model(filepath):
-	'''Takes a halo1 model file and turns it into a jms class.'''
+	'''Takes a halo1 model file and turns it into a jms object.'''
 
 	# These two model types can be imported the same way because of their
 	# nearly matching structures when built into a python object.
