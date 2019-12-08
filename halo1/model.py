@@ -12,9 +12,6 @@ from ..scene.shapes import create_sphere
 def read_halo1model(filepath):
 	'''Takes a halo1 model file and turns it into a jms class.'''
 
-	# Workaround for reclaimer's brokenness on Linux
-	filepath = os.path.realpath(filepath)
-
 	if filepath.endswith('.gbxmodel'):
 		# Load Gbxmodel
 		mod2 = mod2_def.build(filepath=filepath)
@@ -61,7 +58,6 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 		# Assign parent if index is valid.
 		if node.parent_index in range(len(scene_nodes)):
 			scene_node.parent = scene_nodes[node.parent_index]
-			print(scene_node.parent)
 
 		# Store original rotation mode.
 		rot_mode = scene_node.rotation_mode
@@ -74,7 +70,9 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 		scene_node.rotation_mode = rot_mode
 
 		# Undo 100x scaling from jms files.
-		scene_node.location = (node.pos_x*scale, node.pos_y*scale, node.pos_z*scale)
+		scene_node.location = (
+			node.pos_x*scale, node.pos_y*scale, node.pos_z*scale
+		)
 
 		scene_nodes.append(scene_node)
 
