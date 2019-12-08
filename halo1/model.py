@@ -25,7 +25,7 @@ def read_halo1model(filepath):
 		jms = extract_model(tag.data.tagdata, write_jms=False)[0]
 		return jms
 
-	if filepath.endswith('.jms'):
+	if filepath.lower().endswith('.jms'):
 		# Read jms file into string.
 		jms_string = ""
 		with open(filepath, 'r') as jms_file:
@@ -33,7 +33,8 @@ def read_halo1model(filepath):
 		# Read Jms data from string.
 		jms = read_jms(jms_string)
 		# Make sure it's a Halo 1 jms
-		assert(jms.version == "8200")
+		if jms.version != "8200":
+			raise ValueError('Not a Halo 1 jms!')
 
 		return jms
 
