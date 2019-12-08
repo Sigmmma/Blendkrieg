@@ -31,6 +31,12 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		description="Import the nodes/frames.",
 		default=True,
 	)
+	node_size: FloatProperty(
+		name="Node Scene Size",
+		description="Set the size that nodes should have in the Blender scene if at 1.0 scale.",
+		default=0.1,
+		min=0.0,
+	)
 	use_armatures: BoolProperty(
 		name="Import Nodes as Armature",
 		description="Import the nodes as armature.",
@@ -52,6 +58,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		name="Custom Scale",
 		description="Set your own scale.",
 		default=1.0,
+		min=0.0,
 	)
 
 	def execute(self, context):
@@ -73,7 +80,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		jms = read_halo1model(self.filepath)
 
 		# Import nodes into the scene.
-		nodes = import_halo1_nodes(jms, scale=scale)
+		nodes = import_halo1_nodes(jms, scale=scale, node_size=self.node_size)
 
 		return {'FINISHED'}
 
@@ -87,6 +94,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		row.label(text="Nodes:")
 		row.prop(self, "use_nodes")
 		if self.use_nodes:
+			box.prop(self, "node_size")
 			box.prop(self, "use_armatures")
 
 		# Scale settings elements:
