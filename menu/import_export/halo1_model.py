@@ -55,11 +55,6 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 	)
 
 	def execute(self, context):
-		print("Use nodes: " + str(self.use_nodes))
-		print("Use armatures: " + str(self.use_armatures))
-		print("Scale Enum: " + str(self.scale_enum))
-		print("Scale Float: " + str(self.scale_float))
-
 		# Set appropriate scaling
 		# TODO: All of these need constants.
 		scale = 1.0
@@ -73,7 +68,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 			scale = self.scale_float
 		else:
 			raise ValueError('Invalid scale_enum state.')
-		print("Effective scale:", scale)
+
 		# Test if jms import function doesn't crash.
 		jms = read_halo1model(self.filepath)
 
