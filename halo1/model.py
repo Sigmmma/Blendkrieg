@@ -10,6 +10,9 @@ from ..scene.shapes import create_sphere
 def read_halo1model(filepath):
 	'''Takes a halo1 model file and turns it into a jms object.'''
 
+	# TODO: Use a tag handler to see if these files actually are what they
+	# say they are. We can get really nasty parsing problems if they aren't.
+
 	# These two model types can be imported the same way because of their
 	# nearly matching structures when built into a python object.
 	if (filepath.lower().endswith('.gbxmodel')
