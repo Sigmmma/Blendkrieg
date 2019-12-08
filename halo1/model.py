@@ -68,7 +68,7 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 		# Set rotation mode to quaternion and apply the rotation.
 		scene_node.rotation_mode = 'QUATERNION'
 		scene_node.rotation_quaternion = (
-			node.rot_w, node.rot_i, node.rot_j, node.rot_k
+			-node.rot_w, node.rot_i, node.rot_j, node.rot_k
 		)
 		# Set rotation mode back.
 		scene_node.rotation_mode = rot_mode
