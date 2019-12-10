@@ -17,21 +17,27 @@ from . import lib
 from .menu import topbar_dropdown
 from .menu.import_export import halo1_model
 
+modules = [
+	halo1_model,
+	topbar_dropdown,
+]
+
 def register():
 	'''
 	Registers classes on load by calling the
 	register functions in their respective modules.
 	'''
-	halo1_model.register()
-	topbar_dropdown.register()
+	for module in modules:
+		module.register()
 
 def unregister():
 	'''
 	Unregisters classes on unload by calling the
 	unregister functions in their respective modules.
 	'''
-	topbar_dropdown.unregister()
-	halo1_model.register()
+	#Unregister classes in reverse order to avoid any dependency problems.
+	for module in reverse(modules):
+		module.unregister()
 
 if __name__ == "__main__":
 	register()
