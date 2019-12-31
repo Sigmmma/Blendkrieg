@@ -48,8 +48,9 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 	# Jms are scaled at x100 halo. Undo that.
 	scale = scale/100
 
-	scene_nodes = []
-	for node in jms.nodes:
+	scene_nodes = dict()
+	for i in range(len(jms.nodes)):
+		node = jms.nodes[i]
 		scene_node = create_sphere(name="@"+node.name, size=node_size)
 
 		# Assign parent if index is valid.
@@ -71,6 +72,6 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 			node.pos_x*scale, node.pos_y*scale, node.pos_z*scale
 		)
 
-		scene_nodes.append(scene_node)
+		scene_nodes[i] = scene_node
 
 	return scene_nodes
