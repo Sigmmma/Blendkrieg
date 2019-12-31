@@ -64,7 +64,6 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 
 	def execute(self, context):
 		# Set appropriate scaling
-		# TODO: All of these need constants.
 		scale = 1.0
 		if self.scale_enum in SCALE_MULTIPLIERS:
 			scale = SCALE_MULTIPLIERS[self.scale_enum]
