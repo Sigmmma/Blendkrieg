@@ -4,6 +4,7 @@ from bpy.props import BoolProperty, FloatProperty, StringProperty, EnumProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, path_reference_mode, axis_conversion
 
 from ...halo1.model import read_halo1model, import_halo1_nodes
+from ...constants import SCALE_MULTIPLIERS
 
 #@orientation_helper(axis_forward='-Z') Find the right value for this.
 class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
@@ -51,7 +52,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 			('METRIC', "Blender",  "Use Blender's metric scaling."),
 			('MAX',    "3ds Max",  "Use 3dsmax's 100xHalo scale."),
 			('HALO',   "Internal", "Use Halo's internal 1.0 scale (small)."),
-			('CUSTOM', "Custom",   "Set your own scaling."),
+			('CUSTOM', "Custom",   "Set your own scaling multiplier."),
 		)
 	)
 	scale_float: FloatProperty(
@@ -65,12 +66,8 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		# Set appropriate scaling
 		# TODO: All of these need constants.
 		scale = 1.0
-		if self.scale_enum == 'METRIC':
-			scale = 10.0/0.032808/100.0
-		elif self.scale_enum == 'MAX':
-			scale = 100
-		elif self.scale_enum == 'HALO':
-			scale = 1.0
+		if self.scale_enum in SCALE_MULTIPLIERS:
+			scale = SCALE_MULTIPLIERS[self.scale_enum]
 		elif self.scale_enum == 'CUSTOM':
 			scale = self.scale_float
 		else:
