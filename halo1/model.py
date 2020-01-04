@@ -49,8 +49,7 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 	scale = scale/100
 
 	scene_nodes = dict()
-	for i in range(len(jms.nodes)):
-		node = jms.nodes[i]
+	for i, node in enumerate(jms.nodes):
 		scene_node = create_sphere(name="@"+node.name, size=node_size)
 
 		# Assign parent if index is valid.
