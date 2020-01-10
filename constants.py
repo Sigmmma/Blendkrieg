@@ -1,13 +1,12 @@
 
 # These are used to figure out what amount something needs
 # to be scaled when importing or exporting.
+# These scales are based on the JmsModel's base scale. Which is 100x Halo.
 SCALE_MULTIPLIERS = {
-	# 10       : A world unit is 10 feet.
-	# 0.032808 : feet per centimeter
-	# 100.0    : centimeters per meter.
-	'METRIC'   : 10.0/0.032808/100.0,
-	# Halo models in 3dsmax as 100x as big as internally.
-	'MAX'      : 100.0,
-	# Base scale. Used for straight conversions.
-	'HALO'     : 1.0,
+	# One foot is 30.48cm. 1 Jms unit is 1/10 of a foot.
+	'METRIC'   : 3.048,
+	# Halo models in 3dsmax are 1:1 to Jms
+	'MAX'      : 1.0,
+	# Jms models have 100x the scaling of internal Halo models.
+	'HALO'     : 0.01,
 }

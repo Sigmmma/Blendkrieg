@@ -45,9 +45,6 @@ def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a list of them.
 	'''
-	# Jms are scaled at x100 halo. Undo that.
-	scale = scale/100
-
 	scene_nodes = dict()
 	for i, node in enumerate(jms.nodes):
 		scene_node = create_sphere(name="@"+node.name, size=node_size)
