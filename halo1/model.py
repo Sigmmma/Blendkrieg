@@ -5,6 +5,7 @@ from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
 
+from ..constants import JMS_VERSION_HALO_1
 from ..scene.shapes import create_sphere
 
 def read_halo1model(filepath):
@@ -36,7 +37,7 @@ def read_halo1model(filepath):
 		# Read Jms data from string.
 		jms = read_jms(jms_string)
 		# Make sure it's a Halo 1 jms
-		if jms.version != "8200":
+		if jms.version != JMS_VERSION_HALO_1:
 			raise ValueError('Not a Halo 1 jms!')
 
 		return jms

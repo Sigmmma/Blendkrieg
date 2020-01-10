@@ -10,3 +10,6 @@ SCALE_MULTIPLIERS = {
 	# Jms models have 100x the scaling of internal Halo models.
 	'HALO'     : 0.01,
 }
+
+JMS_VERSION_HALO_1 = "8200"
+JMS_VERSION_HALO_2 = "8210"
