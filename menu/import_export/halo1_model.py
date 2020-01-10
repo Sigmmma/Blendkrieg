@@ -116,7 +116,8 @@ def register():
 
 
 def unregister():
-	for cls in reversed(classes): #Reversed because: first in, last out.
+	#Unregister classes in reverse order to avoid any dependency problems.
+	for cls in reversed(classes):
 		unregister_class(cls)
 
 
