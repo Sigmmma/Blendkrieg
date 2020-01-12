@@ -1,6 +1,8 @@
 from bpy.utils import register_class, unregister_class
 from bpy.types import Menu, TOPBAR_MT_editor_menus
 
+from .import_export import halo1_model
+
 class TOPBAR_MT_krieg(Menu):
 	bl_idname = "TOPBAR_MT_krieg_ext"
 	bl_label = "Krieg"
@@ -28,6 +30,11 @@ class TOPBAR_MT_krieg_import(Menu):
 		layout = self.layout
 
 		# Halo 1:
+
+		layout.operator(
+			halo1_model.MT_krieg_ImportHalo1Model.bl_idname,
+			text="Halo 1 Model (.gbxmodel, .model, .jms)"
+		)
 
 		layout.separator()
 
