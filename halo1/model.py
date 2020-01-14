@@ -5,7 +5,7 @@ from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
 
-from ..constants import JMS_VERSION_HALO_1
+from ..constants import ( JMS_VERSION_HALO_1, NODE_SYMBOL, MARKER_SYMBOL )
 from ..scene.shapes import create_sphere
 
 def read_halo1model(filepath):
@@ -42,16 +42,16 @@ def read_halo1model(filepath):
 
 		return jms
 
-def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
+def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a list of them.
 	'''
 	scene_nodes = dict()
 	for i, node in enumerate(jms.nodes):
-		scene_node = create_sphere(name="@"+node.name, size=node_size)
+		scene_node = create_sphere(name=NODE_SYMBOL+node.name, size=node_size)
 
 		# Assign parent if index is valid.
-		if node.parent_index in range(len(scene_nodes)):
+		if node.parent_index in scene_nodes:
 			scene_node.parent = scene_nodes[node.parent_index]
 
 		# Store original rotation mode.
