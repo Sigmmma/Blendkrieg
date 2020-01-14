@@ -3,7 +3,8 @@ from bpy.utils import register_class, unregister_class
 from bpy.props import BoolProperty, FloatProperty, StringProperty, EnumProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, path_reference_mode, axis_conversion
 
-from ...halo1.model import read_halo1model, import_halo1_nodes
+from ...halo1.model import ( read_halo1model, import_halo1_nodes,
+	import_halo1_markers )
 from ...constants import SCALE_MULTIPLIERS
 
 #@orientation_helper(axis_forward='-Z') Find the right value for this.
@@ -44,6 +45,20 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		default=False,
 	)
 
+	# Marker settings:
+
+	use_markers: BoolProperty(
+		name="Import Markers",
+		description="Import the markers.",
+		default=True,
+	)
+	marker_size: FloatProperty(
+		name="Marker Scene Size",
+		description="Set the size that markers should have in the Blender scene.",
+		default=0.05,
+		min=0.0,
+	)
+
 	# Scaling settings:
 
 	scale_enum: EnumProperty(
@@ -77,6 +92,8 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 
 		# Import nodes into the scene.
 		nodes = import_halo1_nodes(jms, scale=scale, node_size=self.node_size)
+		import_halo1_markers(jms, scale=scale,
+			node_size=self.marker_size, scene_nodes=nodes)
 
 		return {'FINISHED'}
 
@@ -92,6 +109,15 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		if self.use_nodes:
 			box.prop(self, "node_size")
 			box.prop(self, "use_armatures")
+
+		# Marker settings elements:
+
+		box = layout.box()
+		row = box.row()
+		row.label(text="Markers:")
+		row.prop(self, "use_markers")
+		if self.use_markers:
+			box.prop(self, "node_size")
 
 		# Scale settings elements:
 

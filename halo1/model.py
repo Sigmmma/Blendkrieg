@@ -65,3 +65,46 @@ def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 		scene_nodes[i] = scene_node
 
 	return scene_nodes
+
+def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
+		scene_nodes=dict(), import_radius=False,
+		permutation_filter=(), region_filter=()
+		):
+	'''
+	Import all the markers from a given jms into a scene.
+	Allows you to specify what permutations you would like to isolate using
+	the permutation_filter. Same goes for regions.
+	'''
+	# The number of regions in a jms model is always known,
+	# so we can just create a default range.
+	if not len(permutation_filter):
+		# Do markers have a -1 no region state? Because this would not work if so.
+		region_filter = range(len(jms.regions))
+
+	for marker in jms.markers:
+		# Permutations cannot be known without seeking through the whole model.
+		# This is an easier way to deal with not being given a filter.
+		if len(permutation_filter):
+			if not (marker.permutation in permutation_filter):
+				# Skip if not in one of the requested permutations.
+				continue
+
+		if not (marker.region in region_filter):
+			# Skip if not in one of the requested regions.
+			continue
+
+		scene_marker = create_sphere(name=MARKER_SYMBOL+marker.name,
+			size=(marker.radius * scale if import_radius else node_size))
+
+		# Assign parent if index is valid.
+		scene_marker.parent = scene_nodes.get(marker.parent, None)
+
+		apply_halo_rotation(scene_marker,
+			(marker.rot_i, marker.rot_j, marker.rot_k, marker.rot_w))
+
+		# Scale to desired size
+		scene_marker.location = (
+			marker.pos_x*scale, marker.pos_y*scale, marker.pos_z*scale
+		)
+
+	#TODO: Should this return something?
