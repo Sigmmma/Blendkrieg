@@ -7,6 +7,7 @@ from reclaimer.model.model_decompilation import extract_model
 
 from ..constants import ( JMS_VERSION_HALO_1, NODE_SYMBOL, MARKER_SYMBOL )
 from ..scene.shapes import create_sphere
+from ..scene.util import apply_halo_rotation
 
 def read_halo1model(filepath):
 	'''Takes a halo1 model file and turns it into a jms object.'''
@@ -44,27 +45,19 @@ def read_halo1model(filepath):
 
 def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 	'''
-	Import all the nodes from a jms into the scene and returns a list of them.
+	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
 	scene_nodes = dict()
 	for i, node in enumerate(jms.nodes):
 		scene_node = create_sphere(name=NODE_SYMBOL+node.name, size=node_size)
 
 		# Assign parent if index is valid.
-		if node.parent_index in scene_nodes:
-			scene_node.parent = scene_nodes[node.parent_index]
+		scene_node.parent = scene_nodes.get(node.parent_index, None)
 
-		# Store original rotation mode.
-		rot_mode = scene_node.rotation_mode
-		# Set rotation mode to quaternion and apply the rotation.
-		scene_node.rotation_mode = 'QUATERNION'
-		scene_node.rotation_quaternion = (
-			-node.rot_w, node.rot_i, node.rot_j, node.rot_k
-		)
-		# Set rotation mode back.
-		scene_node.rotation_mode = rot_mode
+		apply_halo_rotation(scene_node,
+			(node.rot_i, node.rot_j, node.rot_k, node.rot_w))
 
-		# Undo 100x scaling from jms files.
+		# Scale to desired size
 		scene_node.location = (
 			node.pos_x*scale, node.pos_y*scale, node.pos_z*scale
 		)
