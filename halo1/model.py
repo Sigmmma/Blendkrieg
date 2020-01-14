@@ -72,8 +72,15 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 		):
 	'''
 	Import all the markers from a given jms into a scene.
+
+	Will parent to the nodes from scene_nodes.
+
 	Allows you to specify what permutations you would like to isolate using
 	the permutation_filter. Same goes for regions.
+
+	The option to import radius is off by default because this radius goes
+	largely unused, and will just be a nuisance to people using the tool
+	otherwise.
 	'''
 	# The number of regions in a jms model is always known,
 	# so we can just create a default range.
