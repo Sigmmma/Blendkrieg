@@ -51,7 +51,8 @@ def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 	'''
 	scene_nodes = dict()
 	for i, node in enumerate(jms.nodes):
-		scene_node = create_sphere(name=NODE_SYMBOL+node.name, size=node_size)
+		scene_node = create_sphere(
+			name=NODE_NAME_PREFIX+node.name, size=node_size)
 
 		# Assign parent if index is valid.
 		scene_node.parent = scene_nodes.get(node.parent_index, None)
@@ -98,7 +99,8 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 			# Skip if not in one of the requested regions.
 			continue
 
-		scene_marker = create_sphere(name=MARKER_SYMBOL+marker.name,
+		scene_marker = create_sphere(
+			name=MARKER_NAME_PREFIX+marker.name,
 			size=(scale if import_radius else node_size))
 
 		# Set scale to be the size for easy changing of the marker size.
