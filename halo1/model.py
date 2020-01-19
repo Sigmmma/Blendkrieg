@@ -5,8 +5,11 @@ from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
 
-from ..constants import JMS_VERSION_HALO_1
+from ..constants import ( JMS_VERSION_HALO_1, NODE_SYMBOL, MARKER_SYMBOL )
 from ..scene.shapes import create_sphere
+from ..scene.util import set_uniform_scale
+from ..scene.jms_util import ( set_rotation_from_jms,
+	set_translation_from_jms )
 
 def read_halo1model(filepath):
 	'''Takes a halo1 model file and turns it into a jms object.'''
@@ -42,33 +45,73 @@ def read_halo1model(filepath):
 
 		return jms
 
-def import_halo1_nodes(jms, scale=1.0, node_size=0.02):
+def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 	'''
-	Import all the nodes from a jms into the scene and returns a list of them.
+	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
 	scene_nodes = dict()
 	for i, node in enumerate(jms.nodes):
-		scene_node = create_sphere(name="@"+node.name, size=node_size)
+		scene_node = create_sphere(
+			name=NODE_NAME_PREFIX+node.name, size=node_size)
 
 		# Assign parent if index is valid.
-		if node.parent_index in range(len(scene_nodes)):
-			scene_node.parent = scene_nodes[node.parent_index]
+		scene_node.parent = scene_nodes.get(node.parent_index, None)
 
-		# Store original rotation mode.
-		rot_mode = scene_node.rotation_mode
-		# Set rotation mode to quaternion and apply the rotation.
-		scene_node.rotation_mode = 'QUATERNION'
-		scene_node.rotation_quaternion = (
-			-node.rot_w, node.rot_i, node.rot_j, node.rot_k
-		)
-		# Set rotation mode back.
-		scene_node.rotation_mode = rot_mode
+		set_rotation_from_jms(scene_node, node)
 
-		# Undo 100x scaling from jms files.
-		scene_node.location = (
-			node.pos_x*scale, node.pos_y*scale, node.pos_z*scale
-		)
+		set_translation_from_jms(scene_node, node, scale)
 
 		scene_nodes[i] = scene_node
 
 	return scene_nodes
+
+def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
+		scene_nodes=dict(), import_radius=False,
+		permutation_filter=(), region_filter=()
+		):
+	'''
+	Import all the markers from a given jms into a scene.
+
+	Will parent to the nodes from scene_nodes.
+
+	Allows you to specify what permutations you would like to isolate using
+	the permutation_filter. Same goes for regions.
+
+	The option to import radius is off by default because this radius goes
+	largely unused, and will just be a nuisance to people using the tool
+	otherwise.
+	'''
+	# The number of regions in a jms model is always known,
+	# so we can just create a default range.
+	if not len(permutation_filter):
+		# Do markers have a -1 no region state? Because this would not work if so.
+		region_filter = range(len(jms.regions))
+
+	for marker in jms.markers:
+		# Permutations cannot be known without seeking through the whole model.
+		# This is an easier way to deal with not being given a filter.
+		if len(permutation_filter) and not (
+				marker.permutation in permutation_filter):
+			# Skip if not in one of the requested permutations.
+			continue
+
+		if not (marker.region in region_filter):
+			# Skip if not in one of the requested regions.
+			continue
+
+		scene_marker = create_sphere(
+			name=MARKER_NAME_PREFIX+marker.name,
+			size=(scale if import_radius else node_size))
+
+		# Set scale to be the size for easy changing of the marker size.
+		if import_radius:
+			set_uniform_scale(scene_marker, marker.radius)
+
+		# Assign parent if index is valid.
+		scene_marker.parent = scene_nodes.get(marker.parent, None)
+
+		set_rotation_from_jms(scene_marker, marker)
+
+		set_translation_from_jms(scene_marker, marker, scale)
+
+	#TODO: Should this return something?
