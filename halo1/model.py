@@ -7,7 +7,9 @@ from reclaimer.model.model_decompilation import extract_model
 
 from ..constants import ( JMS_VERSION_HALO_1, NODE_SYMBOL, MARKER_SYMBOL )
 from ..scene.shapes import create_sphere
-from ..scene.util import apply_halo_rotation
+from ..scene.util import set_uniform_scale
+from ..scene.jms_util import ( set_rotation_from_jms,
+	set_translation_from_jms )
 
 def read_halo1model(filepath):
 	'''Takes a halo1 model file and turns it into a jms object.'''
@@ -54,13 +56,9 @@ def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 		# Assign parent if index is valid.
 		scene_node.parent = scene_nodes.get(node.parent_index, None)
 
-		apply_halo_rotation(scene_node,
-			(node.rot_i, node.rot_j, node.rot_k, node.rot_w))
+		set_rotation_from_jms(scene_node, node)
 
-		# Scale to desired size
-		scene_node.location = (
-			node.pos_x*scale, node.pos_y*scale, node.pos_z*scale
-		)
+		set_translation_from_jms(scene_node, node, scale)
 
 		scene_nodes[i] = scene_node
 
@@ -105,18 +103,13 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 
 		# Set scale to be the size for easy changing of the marker size.
 		if import_radius:
-			scene_marker.scale = (
-				marker.radius*scale, marker.radius*scale, marker.radius*scale)
+			set_uniform_scale(scene_marker, marker.radius)
 
 		# Assign parent if index is valid.
 		scene_marker.parent = scene_nodes.get(marker.parent, None)
 
-		apply_halo_rotation(scene_marker,
-			(marker.rot_i, marker.rot_j, marker.rot_k, marker.rot_w))
+		set_rotation_from_jms(scene_marker, marker)
 
-		# Scale to desired size
-		scene_marker.location = (
-			marker.pos_x*scale, marker.pos_y*scale, marker.pos_z*scale
-		)
+		set_translation_from_jms(scene_marker, marker, scale)
 
 	#TODO: Should this return something?
