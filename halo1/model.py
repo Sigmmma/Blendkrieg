@@ -91,17 +91,22 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 	for marker in jms.markers:
 		# Permutations cannot be known without seeking through the whole model.
 		# This is an easier way to deal with not being given a filter.
-		if len(permutation_filter):
-			if not (marker.permutation in permutation_filter):
-				# Skip if not in one of the requested permutations.
-				continue
+		if len(permutation_filter) and not (
+				marker.permutation in permutation_filter):
+			# Skip if not in one of the requested permutations.
+			continue
 
 		if not (marker.region in region_filter):
 			# Skip if not in one of the requested regions.
 			continue
 
 		scene_marker = create_sphere(name=MARKER_SYMBOL+marker.name,
-			size=(marker.radius * scale if import_radius else node_size))
+			size=(scale if import_radius else node_size))
+
+		# Set scale to be the size for easy changing of the marker size.
+		if import_radius:
+			scene_marker.scale = (
+				marker.radius*scale, marker.radius*scale, marker.radius*scale)
 
 		# Assign parent if index is valid.
 		scene_marker.parent = scene_nodes.get(marker.parent, None)
