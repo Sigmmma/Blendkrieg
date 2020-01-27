@@ -46,7 +46,7 @@ def read_halo1model(filepath):
 
 		return jms
 
-def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
+def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
@@ -66,7 +66,7 @@ def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 
 	return scene_nodes
 
-def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
+def import_halo1_markers_from_jms(jms, *, scale=1.0, node_size=0.01,
 		scene_nodes=dict(), import_radius=False,
 		permutation_filter=(), region_filter=()
 		):
@@ -117,7 +117,7 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 
 	#TODO: Should this return something?
 
-def import_halo1_region(jms, *, scale=1.0, region_filter=()):
+def import_halo1_region_from_jms(jms, *, scale=1.0, region_filter=()):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
 	'''
