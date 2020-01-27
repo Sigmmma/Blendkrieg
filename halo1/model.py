@@ -152,9 +152,10 @@ def import_halo1_region(jms, *, scale=1.0):
 	# Get the edge normals for each triangle using the vertex indices.
 
 	tri_normals = map(
-		lambda t : (vertex_normals[t[0]],
-					vertex_normals[t[1]],
-					vertex_normals[t[2]]),
+		lambda t : (
+			vertex_normals[t[0]],
+			vertex_normals[t[1]],
+			vertex_normals[t[2]]),
 		triangles
 	)
 
