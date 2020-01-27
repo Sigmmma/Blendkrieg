@@ -4,7 +4,7 @@ from bpy.props import BoolProperty, FloatProperty, StringProperty, EnumProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, path_reference_mode, axis_conversion
 
 from ...halo1.model import ( read_halo1model, import_halo1_nodes,
-	import_halo1_markers )
+	import_halo1_markers, import_halo1_region )
 from ...constants import SCALE_MULTIPLIERS
 
 #@orientation_helper(axis_forward='-Z') Find the right value for this.
@@ -94,6 +94,8 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		nodes = import_halo1_nodes(jms, scale=scale, node_size=self.node_size)
 		import_halo1_markers(jms, scale=scale,
 			node_size=self.marker_size, scene_nodes=nodes)
+
+		import_halo1_region(jms, scale=scale)
 
 		return {'FINISHED'}
 

@@ -1,11 +1,12 @@
 import bpy
+import itertools
 
 from reclaimer.hek.defs.mode import mode_def
 from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
 
-from ..constants import ( JMS_VERSION_HALO_1, NODE_SYMBOL, MARKER_SYMBOL )
+from ..constants import ( JMS_VERSION_HALO_1, NODE_NAME_PREFIX, MARKER_NAME_PREFIX )
 from ..scene.shapes import create_sphere
 from ..scene.util import set_uniform_scale
 from ..scene.jms_util import ( set_rotation_from_jms,
@@ -115,3 +116,69 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 		set_translation_from_jms(scene_marker, marker, scale)
 
 	#TODO: Should this return something?
+
+def import_halo1_region(jms, *, scale=1.0):
+	'''
+	Imports all the geometry into a Halo 1 JMS into the scene.
+	'''
+	# Meshes and objects need names.
+	name = "placeholder name"
+
+	# Start by creating a mesh.
+
+	mesh = bpy.data.meshes.new(name)
+
+	# Ready the vertices and triangles or the mesh.
+
+	vertices = tuple(map(
+			lambda v : (v.pos_x * scale, v.pos_y * scale, v.pos_z * scale),
+			jms.verts
+		)
+	)
+
+	triangles = tuple(map(lambda t : (t.v0, t.v1, t.v2), jms.tris))
+
+	# Import the verts and tris into the mesh.
+	# verts, edges, tris. If () is given for edges Blender will infer them.
+
+	mesh.from_pydata(vertices, (), triangles)
+
+	# Get the vertex normals ready.
+
+	vertex_normals = tuple(
+		map(lambda v : (v.norm_i, v.norm_j, v.norm_k), jms.verts)
+	)
+
+	# Get the edge normals for each triangle using the vertex indices.
+
+	tri_normals = map(
+		lambda t : (vertex_normals[t[0]],
+					vertex_normals[t[1]],
+					vertex_normals[t[2]]),
+		triangles
+	)
+
+	# Chain all of the triangle normals together into loop normals.
+	# ((x, y, z), (x, y, z), (x, y, z)), ((x, y, z), (x, y, z), (x, y, z)),
+	#    |    |    |
+	#    V    V    V
+	# ((x, y, z), (x, y, z), (x, y, z), (x, y, z), (x, y, z), (x, y, z)),
+	# Loops are the points of triangles so to speak.
+
+	# Import them into the mesh.
+
+	mesh.normals_split_custom_set(tuple(itertools.chain(*tri_normals)))
+
+	# Blender won't display the normals if we don't set this for some reason.
+
+	mesh.use_auto_smooth = True
+
+	# Validate the mesh and make sure it doesn't have any invalid indices.
+
+	mesh.validate()
+
+	# Create the object, and link it to the scene.
+
+	region_obj = bpy.data.objects.new(name, mesh)
+	scene = bpy.context.collection
+	scene.objects.link(region_obj)
