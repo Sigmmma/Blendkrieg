@@ -7,7 +7,7 @@
 # basic lists and dictionaries instead of whatever Blender is using.
 # This should, in theory, be a drop-in replacement for testing.
 
-from mathutils import Vector
+from mathutils import Euler, Vector
 
 class Data:
 	def __init__(self):
@@ -27,6 +27,8 @@ class Object:
 		self.location = Vector()       # Coordinate location of this object
 		self.name = None               # Name as it appears in Outliner
 		self.parent = None             # The object this object is parented to
+		self.rotation_euler = Euler()  # Rotation in Euler coordinates
+		self.rotation_mode = 'XYZ'     # Rotation mode (or Euler coordinate order)
 		self.users_collection = set()  # All the collections this object belongs to
 
 
@@ -53,6 +55,17 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 
 		loc = nested[name].get('location', Vector())
 		obj.location = Vector((loc[0], loc[1], loc[2]))
+
+		rot = nested[name].get('rotation', Euler())
+		if isinstance(rot, Euler):
+			obj.rotation_euler = rot
+
+			# FIXME This is hard-coded as XYZ for now because mathutils 2.81.2
+			# doesn't support other orders for Euler coordinates.
+			obj.rotation_mode = 'XYZ'
+		# TODO Set Quaternion and handle Quaternion and mode
+		else:
+			raise Exception('Invalid rotation type: ' + str(type(rot)))
 
 		if parent:
 			obj.parent = parent

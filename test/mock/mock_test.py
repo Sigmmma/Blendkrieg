@@ -1,6 +1,6 @@
 from pocha import *
 from hamcrest import *
-from mathutils import Vector
+from mathutils import Euler, Vector
 
 import bpy
 # Put this assert outside of the Pocha stuff so we exception out before we even
@@ -219,4 +219,58 @@ def blenderMockTests():
 		assert_that(obj2.location,
 			equal_to(Vector((4, 5, 6))),
 			'Object location set by components')
+
+	@it('Getting object rotation (euler)')
+	def objectRotationEulerGet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {
+				'rotation': Euler((1, 2, 3))
+			}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		assert_that(obj1.rotation_euler,
+			equal_to(Euler((0, 0, 0))),
+			'Object rotation defaults to (0, 0, 0)')
+
+		assert_that(obj1.rotation_mode,
+			equal_to('XYZ'),
+			'Object rotation defaults to XYZ')
+
+		rot = obj2.rotation_euler
+		assert_that(rot, equal_to(Euler((1, 2, 3))), 'Object rotation is set')
+		assert_that(rot.x, equal_to(1), 'X component addressable')
+		assert_that(rot.y, equal_to(2), 'Y component addressable')
+		assert_that(rot.z, equal_to(3), 'Z component addressable')
+
+	@it('Setting object rotation (euler)')
+	def objectRotationEulerSet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		obj1.rotation_euler = Euler((1, 2, 3))
+		obj2.rotation_euler.x = 1
+		obj2.rotation_euler.y = 2
+		obj2.rotation_euler.z = 3
+
+		assert_that(obj1.rotation_euler,
+			equal_to(Euler((1, 2, 3))),
+			'Object rotation set by Euler')
+
+		assert_that(obj2.rotation_euler,
+			equal_to(Euler((1, 2, 3))),
+			'Object rotation set by components')
+
+	# TODO the standalone mathutils we're using (v2.81.2) doesn't support
+	# setting the coordinate order for Euler rotation. When that support is
+	# added, we'll want to add another test here for changing rotation mode to
+	# 'ZYX' and making sure the coordinates are re-ordered.
 
