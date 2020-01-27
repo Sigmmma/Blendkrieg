@@ -170,7 +170,8 @@ def import_halo1_region(jms, *, scale=1.0):
 
 	mesh.normals_split_custom_set(tuple(itertools.chain(*tri_normals)))
 
-	# Blender won't display the normals if we don't set this for some reason.
+	# Blender will only display custom vertex normals with this enabled.
+	# 0.0 vectors are passed through to use actual auto smooth.
 
 	mesh.use_auto_smooth = True
 
