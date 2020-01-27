@@ -58,36 +58,41 @@ def set_uniform_scale(scene_object, scale=1.0):
 
 def reduce_vertices(verts, tris):
 	'''
-	Takes a set of preprocessed vertices and triangles and deletes and unused
-	or double vertices.
+	Takes a set of preprocessed vertices and triangles and deletes unused
+	or duplicate vertices.
 	'''
 
-	### Remove unused vertices
-
 	# Get a set of all vertex indices used by the tris
-
 	used_indices = set(itertools.chain(*tris))
 
+	# Translation dict that contains the unique vertices as keys, and their new
+	# indices as values.
 	translation_dict = {}
+	# List of unique vertices.
 	unique_verts = []
 
 	for i in used_indices:
 		count = len(unique_verts)
-
 		vert = verts[i]
 
+		# Returns the id for an existing identical vertex if it exists.
+		# Returns the next index of the unique_verts list if not found.
 		new_id = translation_dict.setdefault(vert, count)
 
+		# If the new id is not within the list
+		# we need to add the vert to the end of our condensed list.
 		if not new_id < count:
 			unique_verts.append(vert)
 
-	new_tris = tuple(
-		map(lambda t : (
+	# Convert the vertex ids in the triangles to ids that properly reference
+	# the new list.
+	new_tris = map(
+		lambda t : (
 			translation_dict[verts[t[0]]],
 			translation_dict[verts[t[1]]],
 			translation_dict[verts[t[2]]],
-			), tris
-		)
+		), tris
 	)
 
-	return unique_verts, new_tris
+	# Return as tuples because they are nice and fast.
+	return tuple(unique_verts), tuple(new_tris)
