@@ -7,6 +7,8 @@
 # basic lists and dictionaries instead of whatever Blender is using.
 # This should, in theory, be a drop-in replacement for testing.
 
+from mathutils import Vector
+
 class Data:
 	def __init__(self):
 		self.collections = dict() # All the collections in the scene
@@ -22,6 +24,7 @@ class Collection:
 class Object:
 	def __init__(self):
 		self.children = list()         # Objects parented to this object
+		self.location = Vector()       # Coordinate location of this object
 		self.name = None               # Name as it appears in Outliner
 		self.parent = None             # The object this object is parented to
 		self.users_collection = set()  # All the collections this object belongs to
@@ -47,6 +50,9 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 	for name in nested:
 		obj = Object()
 		obj.name = name
+
+		loc = nested[name].get('location', Vector())
+		obj.location = Vector((loc[0], loc[1], loc[2]))
 
 		if parent:
 			obj.parent = parent

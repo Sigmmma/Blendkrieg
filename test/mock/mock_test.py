@@ -1,7 +1,10 @@
 from pocha import *
 from hamcrest import *
+from mathutils import Vector
 
 import bpy
+# Put this assert outside of the Pocha stuff so we exception out before we even
+# try to run tests, unless we're using the mocks.
 assert_that(bpy.is_mock, equal_to(True))
 
 @describe('Blender mock tests')
@@ -169,4 +172,51 @@ def blenderMockTests():
 				has_items(coll1, coll3, coll4),
 			),
 			'Child2 has its parent\'s collection')
+
+	@it('Getting object location')
+	def objectLocationGet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {
+				'location': (1, 2, 3)
+			}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		assert_that(obj1.location,
+			equal_to(Vector((0, 0, 0))),
+			'Object location defaults to (0, 0, 0)')
+
+		assert_that(obj2.location,
+			equal_to(Vector((1, 2, 3))),
+			'Object location Vector is set')
+
+		assert_that(obj2.location.x, equal_to(1), 'X component addressable')
+		assert_that(obj2.location.y, equal_to(2), 'Y component addressable')
+		assert_that(obj2.location.z, equal_to(3), 'Z component addressable')
+
+	@it('Setting object location')
+	def objectLocationSet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		obj1.location = Vector((1, 2, 3))
+		obj2.location.x = 4
+		obj2.location.y = 5
+		obj2.location.z = 6
+
+		assert_that(obj1.location,
+			equal_to(Vector((1, 2, 3))),
+			'Object location set by Vector')
+
+		assert_that(obj2.location,
+			equal_to(Vector((4, 5, 6))),
+			'Object location set by components')
 
