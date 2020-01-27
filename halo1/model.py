@@ -117,40 +117,37 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 
 	#TODO: Should this return something?
 
-def import_halo1_region(jms, *, scale=1.0):
+def import_halo1_region(jms, *, scale=1.0, region_filter=()):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
 	'''
-	# Meshes and objects need names.
-	name = "placeholder name"
 
-	# Start by creating a mesh.
+	if not len(region_filter):
+		region_filter = range(len(jms.regions))
 
-	mesh = bpy.data.meshes.new(name)
+	### Geometry preprocessing.
 
-	# Ready the vertices and triangles or the mesh.
-
+	# Ready the vertices.
 	vertices = tuple(map(
 			lambda v : (v.pos_x * scale, v.pos_y * scale, v.pos_z * scale),
 			jms.verts
 		)
 	)
 
-	triangles = tuple(map(lambda t : (t.v0, t.v1, t.v2), jms.tris))
+	# Ready the triangles.
 
-	# Import the verts and tris into the mesh.
-	# verts, edges, tris. If () is given for edges Blender will infer them.
+	# Filter the triangles so only the wished regions are retrieved.
+	triangles = filter(lambda t : t.region in region_filter, jms.tris)
 
-	mesh.from_pydata(vertices, (), triangles)
+	# Reduce the triangles to just their key components.
+	triangles = tuple(map(lambda t : (t.v0, t.v1, t.v2), triangles))
 
-	# Get the vertex normals ready.
-
+	# Unpack the vertex normals.
 	vertex_normals = tuple(
 		map(lambda v : (v.norm_i, v.norm_j, v.norm_k), jms.verts)
 	)
 
-	# Get the edge normals for each triangle using the vertex indices.
-
+	# Convert the vertex normals to triangle normals.
 	tri_normals = map(
 		lambda t : (
 			vertex_normals[t[0]],
@@ -166,9 +163,24 @@ def import_halo1_region(jms, *, scale=1.0):
 	# ((x, y, z), (x, y, z), (x, y, z), (x, y, z), (x, y, z), (x, y, z)),
 	# Loops are the points of triangles so to speak.
 
-	# Import them into the mesh.
+	loop_normals = tuple(itertools.chain(*tri_normals))
 
-	mesh.normals_split_custom_set(tuple(itertools.chain(*tri_normals)))
+	### Importing the data into a mesh
+
+	# Meshes and objects need names.
+	name = "placeholder name"
+
+	# Make a mesh to hold all relevant data.
+	mesh = bpy.data.meshes.new(name)
+
+	# Import the verts and tris into the mesh.
+	# verts, edges, tris. If () is given for edges Blender will infer them.
+
+	mesh.from_pydata(vertices, (), triangles)
+
+	# Import loop normals into the mesh.
+
+	mesh.normals_split_custom_set(loop_normals)
 
 	# Blender will only display custom vertex normals with this enabled.
 	# 0.0 vectors are passed through to use actual auto smooth.
