@@ -1,6 +1,7 @@
 '''
 Functions for interfacing Halo stuff with the Blender scene.
 '''
+import itertools
 
 def set_rotation(scene_object, *, i=0.0, j=0.0, k=0.0, w=-1.0):
 	'''
@@ -54,3 +55,39 @@ def get_translation(scene_object, scale=1.0):
 def set_uniform_scale(scene_object, scale=1.0):
 	'''Takes a blender object and sets all of its axis to the same scale.'''
 	scene_object.scale = (scale, scale, scale)
+
+def reduce_vertices(verts, tris):
+	'''
+	Takes a set of preprocessed vertices and triangles and deletes and unused
+	or double vertices.
+	'''
+
+	### Remove unused vertices
+
+	# Get a set of all vertex indices used by the tris
+
+	used_indices = set(itertools.chain(*tris))
+
+	translation_dict = {}
+	unique_verts = []
+
+	for i in used_indices:
+		count = len(unique_verts)
+
+		vert = verts[i]
+
+		new_id = translation_dict.setdefault(vert, count)
+
+		if not new_id < count:
+			unique_verts.append(vert)
+
+	new_tris = tuple(
+		map(lambda t : (
+			translation_dict[verts[t[0]]],
+			translation_dict[verts[t[1]]],
+			translation_dict[verts[t[2]]],
+			), tris
+		)
+	)
+
+	return unique_verts, new_tris

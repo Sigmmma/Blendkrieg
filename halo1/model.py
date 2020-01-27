@@ -8,7 +8,7 @@ from reclaimer.model.model_decompilation import extract_model
 
 from ..constants import ( JMS_VERSION_HALO_1, NODE_NAME_PREFIX, MARKER_NAME_PREFIX )
 from ..scene.shapes import create_sphere
-from ..scene.util import set_uniform_scale
+from ..scene.util import set_uniform_scale, reduce_vertices
 from ..scene.jms_util import ( set_rotation_from_jms,
 	set_translation_from_jms )
 
@@ -155,6 +155,9 @@ def import_halo1_region_from_jms(jms, *, scale=1.0, region_filter=()):
 			vertex_normals[t[2]]),
 		triangles
 	)
+
+	# Remove unused vertices
+	vertices, triangles = reduce_vertices(vertices, triangles)
 
 	# Chain all of the triangle normals together into loop normals.
 	# ((x, y, z), (x, y, z), (x, y, z)), ((x, y, z), (x, y, z), (x, y, z)),
