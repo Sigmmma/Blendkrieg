@@ -1,4 +1,5 @@
 import bpy
+import os
 from bpy.utils import register_class, unregister_class
 from bpy.props import BoolProperty, FloatProperty, StringProperty, EnumProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, path_reference_mode, axis_conversion
@@ -7,7 +8,7 @@ from ...halo1.model import (
 	read_halo1model,
 	import_halo1_nodes_from_jms,
 	import_halo1_markers_from_jms,
-	import_halo1_region_from_jms,
+	import_halo1_all_regions_from_jms,
 )
 from ...constants import SCALE_MULTIPLIERS
 
@@ -94,12 +95,15 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		# Test if jms import function doesn't crash.
 		jms = read_halo1model(self.filepath)
 
+		# Get name without path or file extension.
+		name = os.path.basename(os.path.splitext(self.filepath)[0])
+
 		# Import nodes into the scene.
 		nodes = import_halo1_nodes_from_jms(jms, scale=scale, node_size=self.node_size)
 		import_halo1_markers_from_jms(jms, scale=scale,
 			node_size=self.marker_size, scene_nodes=nodes)
 
-		import_halo1_region_from_jms(jms, scale=scale, region_filter=())
+		import_halo1_all_regions_from_jms(jms, name=name, scale=scale)
 
 		return {'FINISHED'}
 

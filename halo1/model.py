@@ -117,7 +117,7 @@ def import_halo1_markers_from_jms(jms, *, scale=1.0, node_size=0.01,
 
 	#TODO: Should this return something?
 
-def import_halo1_region_from_jms(jms, *, scale=1.0, region_filter=()):
+def import_halo1_region_from_jms(jms, *, name="", scale=1.0, region_filter=()):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
 	'''
@@ -170,9 +170,6 @@ def import_halo1_region_from_jms(jms, *, scale=1.0, region_filter=()):
 
 	### Importing the data into a mesh
 
-	# Meshes and objects need names.
-	name = "placeholder name"
-
 	# Make a mesh to hold all relevant data.
 	mesh = bpy.data.meshes.new(name)
 
@@ -199,3 +196,17 @@ def import_halo1_region_from_jms(jms, *, scale=1.0, region_filter=()):
 	region_obj = bpy.data.objects.new(name, mesh)
 	scene = bpy.context.collection
 	scene.objects.link(region_obj)
+
+	return region_obj
+
+def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0):
+	'''
+	Import all regions from a given jms.
+	'''
+	for i in range(len(jms.regions)):
+		import_halo1_region_from_jms(
+			jms,
+			name=name+":"+jms.regions[i],
+			scale=scale,
+			region_filter=(i,)
+		)
