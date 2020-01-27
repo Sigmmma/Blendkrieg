@@ -175,24 +175,19 @@ def import_halo1_region_from_jms(jms, *, name="", scale=1.0, region_filter=()):
 
 	# Import the verts and tris into the mesh.
 	# verts, edges, tris. If () is given for edges Blender will infer them.
-
 	mesh.from_pydata(vertices, (), triangles)
 
 	# Import loop normals into the mesh.
-
 	mesh.normals_split_custom_set(loop_normals)
 
 	# Blender will only display custom vertex normals with this enabled.
 	# 0.0 vectors are passed through to use actual auto smooth.
-
 	mesh.use_auto_smooth = True
 
 	# Validate the mesh and make sure it doesn't have any invalid indices.
-
 	mesh.validate()
 
 	# Create the object, and link it to the scene.
-
 	region_obj = bpy.data.objects.new(name, mesh)
 	scene = bpy.context.collection
 	scene.objects.link(region_obj)
