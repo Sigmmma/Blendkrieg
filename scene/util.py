@@ -59,40 +59,41 @@ def set_uniform_scale(scene_object, scale=1.0):
 def reduce_vertices(verts, tris):
 	'''
 	Takes a set of preprocessed vertices and triangles and deletes unused
-	or duplicate vertices.
+	vertices.
 	'''
 
-	# Get a set of all vertex indices used by the tris
-	used_indices = set(itertools.chain(*tris))
+	# Get a tuple of all unique vertex indices used by the tris
+	used_indices = tuple(set(itertools.chain(*tris)))
 
-	# Translation dict that contains the unique vertices as keys, and their new
-	# indices as values.
+	# Translation dict that will contain the used_indices as keys,
+	# and their new indices as values.
 	translation_dict = {}
 	# List of unique vertices.
-	unique_verts = []
+	new_verts = []
 
-	for i in used_indices:
-		count = len(unique_verts)
-		vert = verts[i]
+	for old_i in used_indices:
+		# Get the next index in the new_verts list
+		next_i = len(new_verts)
+		# Get the translated id for this vertex. Use the next id if not.
+		new_i = translation_dict.setdefault(old_i, next_i)
 
-		# Returns the id for an existing identical vertex if it exists.
-		# Returns the next index of the unique_verts list if not found.
-		new_id = translation_dict.setdefault(vert, count)
+		# This shouldn't be possible. But better to be paranoid than sorry.
+		assert new_i <= next_i, "Reached in invalid id."
 
-		# If the new id is not within the list
-		# we need to add the vert to the end of our condensed list.
-		if not new_id < count:
-			unique_verts.append(vert)
+		# If the new index is actually new we append its corresponding vertex
+		# to our new vertex list.
+		if not new_i < next_i:
+			new_verts.append(verts[old_i])
 
 	# Convert the vertex ids in the triangles to ids that properly reference
 	# the new list.
 	new_tris = map(
 		lambda t : (
-			translation_dict[verts[t[0]]],
-			translation_dict[verts[t[1]]],
-			translation_dict[verts[t[2]]],
+			translation_dict[t[0]],
+			translation_dict[t[1]],
+			translation_dict[t[2]],
 		), tris
 	)
 
 	# Return as tuples because they are nice and fast.
-	return tuple(unique_verts), tuple(new_tris)
+	return tuple(new_verts), tuple(new_tris)
