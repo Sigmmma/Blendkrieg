@@ -1,6 +1,6 @@
 from pocha import *
 from hamcrest import *
-from mathutils import Euler, Vector
+from mathutils import Euler, Quaternion, Vector
 
 import bpy
 # Put this assert outside of the Pocha stuff so we exception out before we even
@@ -273,4 +273,59 @@ def blenderMockTests():
 	# setting the coordinate order for Euler rotation. When that support is
 	# added, we'll want to add another test here for changing rotation mode to
 	# 'ZYX' and making sure the coordinates are re-ordered.
+
+	@it('Getting object rotation (quaternion')
+	def objectRotationQuaternionGet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {
+				'rotation': Quaternion((1, 2, 3, 4))
+			}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		assert_that(obj1.rotation_quaternion,
+			equal_to(Quaternion((1, 0, 0, 0))),
+			'Object rotation defaults to (1, 0, 0, 0)')
+
+		assert_that(obj1.rotation_mode,
+			equal_to('XYZ'),
+			'Rotation mode defaults to XYZ')
+
+		assert_that(obj2.rotation_mode,
+			equal_to('QUATERNION'),
+			'Rotation mode changes to QUATERNION for Quaternions')
+
+		rot = obj2.rotation_quaternion
+		assert_that(rot, equal_to(Quaternion((1, 2, 3, 4))), 'Object rotation is set')
+		assert_that(rot.w, equal_to(1), 'W component addressable')
+		assert_that(rot.x, equal_to(2), 'X component addressable')
+		assert_that(rot.y, equal_to(3), 'Y component addressable')
+		assert_that(rot.z, equal_to(4), 'Z component addressable')
+
+	@it('Setting object rotation (quaternion)')
+	def objectRotationQuaterionSet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		obj1.rotation_quaternion = Quaternion((1, 2, 3, 4))
+		obj2.rotation_quaternion.w = 1
+		obj2.rotation_quaternion.x = 2
+		obj2.rotation_quaternion.y = 3
+		obj2.rotation_quaternion.z = 4
+
+		assert_that(obj1.rotation_quaternion,
+			equal_to(Quaternion((1, 2, 3, 4))),
+			'Object rotation set by Quaternion')
+
+		assert_that(obj2.rotation_quaternion,
+			equal_to(Quaternion((1, 2, 3, 4))),
+			'Object rotation set by components')
 
