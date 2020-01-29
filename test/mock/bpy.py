@@ -30,6 +30,7 @@ class Object:
 		self.rotation_euler = Euler()  # Rotation in Euler coordinates
 		self.rotation_mode = 'XYZ'     # Rotation mode (or Euler coordinate order)
 		self.rotation_quaternion = Quaternion() # Rotation in Quaternion coordinates
+		self.scale = Vector()          # Scale of this object
 		self.users_collection = set()  # All the collections this object belongs to
 
 
@@ -71,6 +72,9 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 			obj.rotation_euler = rot.to_euler()
 		else:
 			raise Exception('Invalid rotation type: ' + str(type(rot)))
+
+		scale = nested[name].get('scale', Vector())
+		obj.scale = Vector((scale[0], scale[1], scale[2]))
 
 		if parent:
 			obj.parent = parent
