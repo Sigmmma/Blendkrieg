@@ -63,11 +63,11 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 			# doesn't support other orders for Euler coordinates.
 			# TODO is this how Blender handles setting rotation for other modes?
 			obj.rotation_mode = 'XYZ'
-			obj.rotation_euler = rot
+			obj.rotation_euler = Euler((rot.x, rot.y, rot.z))
 			obj.rotation_quaternion = rot.to_quaternion()
 		elif isinstance(rot, Quaternion):
 			obj.rotation_mode = 'QUATERNION'
-			obj.rotation_quaternion = rot
+			obj.rotation_quaternion = Quaternion((rot.w, rot.x, rot.y, rot.z))
 			obj.rotation_euler = rot.to_euler()
 		else:
 			raise Exception('Invalid rotation type: ' + str(type(rot)))
