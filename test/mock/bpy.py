@@ -30,6 +30,7 @@ class Object:
 		self.rotation_euler = Euler()  # Rotation in Euler coordinates
 		self.rotation_mode = 'XYZ'     # Rotation mode (or Euler coordinate order)
 		self.rotation_quaternion = Quaternion() # Rotation in Quaternion coordinates
+		self.scale = Vector()          # Scale of this object
 		self.users_collection = set()  # All the collections this object belongs to
 
 
@@ -63,14 +64,17 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 			# doesn't support other orders for Euler coordinates.
 			# TODO is this how Blender handles setting rotation for other modes?
 			obj.rotation_mode = 'XYZ'
-			obj.rotation_euler = rot
+			obj.rotation_euler = Euler((rot.x, rot.y, rot.z))
 			obj.rotation_quaternion = rot.to_quaternion()
 		elif isinstance(rot, Quaternion):
 			obj.rotation_mode = 'QUATERNION'
-			obj.rotation_quaternion = rot
+			obj.rotation_quaternion = Quaternion((rot.w, rot.x, rot.y, rot.z))
 			obj.rotation_euler = rot.to_euler()
 		else:
 			raise Exception('Invalid rotation type: ' + str(type(rot)))
+
+		scale = nested[name].get('scale', Vector())
+		obj.scale = Vector((scale[0], scale[1], scale[2]))
 
 		if parent:
 			obj.parent = parent

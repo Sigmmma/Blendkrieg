@@ -329,3 +329,46 @@ def blenderMockTests():
 			equal_to(Quaternion((1, 2, 3, 4))),
 			'Object rotation set by components')
 
+	@it('Getting object scale')
+	def objectScaleGet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {
+				'scale': (1, 2, 3)
+			}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		assert_that(obj1.scale,
+			equal_to(Vector()),
+			'Object scale defaults to (1, 1, 1)')
+
+		assert_that(obj2.scale.x, equal_to(1), 'X component addressable')
+		assert_that(obj2.scale.y, equal_to(2), 'Y component addressable')
+		assert_that(obj2.scale.z, equal_to(3), 'Z component addressable')
+
+	@it('Setting object scale')
+	def objectScaleSet():
+		bpy.set_scene_data({
+			'obj1': {},
+			'obj2': {}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		obj1.scale = Vector((1, 2, 3))
+		obj2.scale.x = 1
+		obj2.scale.y = 2
+		obj2.scale.z = 3
+
+		assert_that(obj1.scale,
+			equal_to(Vector((1, 2, 3))),
+			'Object scale set by Vector')
+
+		assert_that(obj2.scale,
+			equal_to(Vector((1, 2, 3))),
+			'Object scale set by components')
+
