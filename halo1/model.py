@@ -1,13 +1,14 @@
 import bpy
+import itertools
 
 from reclaimer.hek.defs.mode import mode_def
 from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
 
-from ..constants import ( JMS_VERSION_HALO_1, NODE_SYMBOL, MARKER_SYMBOL )
+from ..constants import ( JMS_VERSION_HALO_1, NODE_NAME_PREFIX, MARKER_NAME_PREFIX )
 from ..scene.shapes import create_sphere
-from ..scene.util import set_uniform_scale
+from ..scene.util import set_uniform_scale, reduce_vertices
 from ..scene.jms_util import ( set_rotation_from_jms,
 	set_translation_from_jms )
 
@@ -45,7 +46,7 @@ def read_halo1model(filepath):
 
 		return jms
 
-def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
+def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
@@ -65,7 +66,7 @@ def import_halo1_nodes(jms, *, scale=1.0, node_size=0.02):
 
 	return scene_nodes
 
-def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
+def import_halo1_markers_from_jms(jms, *, scale=1.0, node_size=0.01,
 		scene_nodes=dict(), import_radius=False,
 		permutation_filter=(), region_filter=()
 		):
@@ -115,3 +116,92 @@ def import_halo1_markers(jms, *, scale=1.0, node_size=0.01,
 		set_translation_from_jms(scene_marker, marker, scale)
 
 	#TODO: Should this return something?
+
+def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filter=()):
+	'''
+	Imports all the geometry into a Halo 1 JMS into the scene.
+	'''
+
+	if not region_filter:
+		region_filter = range(len(jms.regions))
+
+	### Geometry preprocessing.
+
+	# Ready the vertices.
+	vertices = tuple(map(
+			lambda v : (v.pos_x * scale, v.pos_y * scale, v.pos_z * scale),
+			jms.verts
+		)
+	)
+
+	# Ready the triangles.
+
+	# Filter the triangles so only the wished regions are retrieved.
+	triangles = filter(lambda t : t.region in region_filter, jms.tris)
+
+	# Reduce the triangles to just their key components.
+	triangles = tuple(map(lambda t : (t.v0, t.v1, t.v2), triangles))
+
+	# Unpack the vertex normals.
+	vertex_normals = tuple(
+		map(lambda v : (v.norm_i, v.norm_j, v.norm_k), jms.verts)
+	)
+
+	# Convert the vertex normals to triangle normals.
+	tri_normals = map(
+		lambda t : (
+			vertex_normals[t[0]],
+			vertex_normals[t[1]],
+			vertex_normals[t[2]]),
+		triangles
+	)
+
+	# Remove unused vertices
+	vertices, triangles = reduce_vertices(vertices, triangles)
+
+	# Chain all of the triangle normals together into loop normals.
+	# ((x, y, z), (x, y, z), (x, y, z)), ((x, y, z), (x, y, z), (x, y, z)),
+	#    |    |    |
+	#    V    V    V
+	# ((x, y, z), (x, y, z), (x, y, z), (x, y, z), (x, y, z), (x, y, z)),
+	# Loops are the points of triangles so to speak.
+
+	loop_normals = tuple(itertools.chain(*tri_normals))
+
+	### Importing the data into a mesh
+
+	# Make a mesh to hold all relevant data.
+	mesh = bpy.data.meshes.new(name)
+
+	# Import the verts and tris into the mesh.
+	# verts, edges, tris. If () is given for edges Blender will infer them.
+	mesh.from_pydata(vertices, (), triangles)
+
+	# Import loop normals into the mesh.
+	mesh.normals_split_custom_set(loop_normals)
+
+	# Setting this to true makes Blender display the custom normals.
+	# It feels really wrong. But it is right.
+	mesh.use_auto_smooth = True
+
+	# Validate the mesh and make sure it doesn't have any invalid indices.
+	mesh.validate()
+
+	# Create the object, and link it to the scene.
+	region_obj = bpy.data.objects.new(name, mesh)
+	scene = bpy.context.collection
+	scene.objects.link(region_obj)
+
+	return region_obj
+
+def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0):
+	'''
+	Import all regions from a given jms.
+	'''
+	for i in range(len(jms.regions)):
+		import_halo1_region_from_jms(
+			jms,
+			name=name+":"+jms.regions[i],
+			scale=scale,
+			region_filter=(i,)
+		)
