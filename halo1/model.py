@@ -117,7 +117,7 @@ def import_halo1_markers_from_jms(jms, *, scale=1.0, node_size=0.01,
 
 	#TODO: Should this return something?
 
-def import_halo1_region_from_jms(jms, *, name="", scale=1.0, region_filter=()):
+def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filter=()):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
 	'''
