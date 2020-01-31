@@ -122,7 +122,7 @@ def import_halo1_region_from_jms(jms, *, name="", scale=1.0, region_filter=()):
 	Imports all the geometry into a Halo 1 JMS into the scene.
 	'''
 
-	if not len(region_filter):
+	if not region_filter:
 		region_filter = range(len(jms.regions))
 
 	### Geometry preprocessing.
