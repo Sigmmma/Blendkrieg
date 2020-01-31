@@ -78,7 +78,7 @@ def reduce_vertices(verts, tris):
 		new_i = translation_dict.setdefault(old_i, next_i)
 
 		# This shouldn't be possible. But better to be paranoid than sorry.
-		assert new_i <= next_i, "Reached in invalid id."
+		assert new_i <= next_i, "Reached an invalid id."
 
 		# If the new index is actually new we append its corresponding vertex
 		# to our new vertex list.
