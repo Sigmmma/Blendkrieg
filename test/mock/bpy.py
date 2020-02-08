@@ -8,6 +8,7 @@
 # This should, in theory, be a drop-in replacement for testing.
 
 from mathutils import Euler, Quaternion, Vector
+from tinyblend import BlenderFile
 
 class Data:
 	def __init__(self):
@@ -42,6 +43,38 @@ def clear_mock():
 	data.collections.clear()
 	data.meshes.clear()
 	data.objects.clear()
+
+def load_scene_data(filename):
+	'''Loads scene data from a Blender .blend file.'''
+	# TODO we need to check that this is v2.8.0 otherwise this stuff won't work
+	blend = BlenderFile(filename)
+
+	for o in blend.list('Object'):
+		obj = Object()
+		obj.name = cleanName(o.id.name).lstrip('OB')
+
+		obj.location = Vector((o.loc[0], o.loc[1], o.loc[2]))
+
+		if o.rotmode == 1:
+			obj.rotation_euler = Euler((o.rot[0], o.rot[1], o.rot[2]))
+			obj.rotation_mode = 'XYZ'
+		elif o.rotmode == 0:
+			obj.rotation_mode = 'QUATERNION'
+			obj.rotation_quaternion = Quaternion((
+				o.quat[0], o.quat[1], o.quat[2], o.quat[3]))
+
+		obj.scale = Vector((o.size[0], o.size[1], o.size[2]))
+
+
+	# Parents come after we set up objects
+		#obj.parent = cleanName(o.parent.id.name).lstrip('OB')
+
+
+	blend.close()
+
+def cleanName(name):
+	'''Strips all that \x00 crap off the end of internal Blender names.'''
+	return name.decode('utf-8').strip('\x00')
 
 def set_scene_data(nested):
 	'''Uses a nested dictionary to create all of the objects in the scene.

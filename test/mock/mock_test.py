@@ -1,6 +1,7 @@
 from pocha import *
 from hamcrest import *
 from mathutils import Euler, Quaternion, Vector
+from math import radians
 
 import bpy
 # Put this assert outside of the Pocha stuff so we exception out before we even
@@ -371,4 +372,34 @@ def blenderMockTests():
 		assert_that(obj2.scale,
 			equal_to(Vector((1, 2, 3))),
 			'Object scale set by components')
+
+	@it('Loading scene from a .blend file')
+	def modelLoadFromJMS():
+		bpy.load_scene_data('test/mock/plane.blend')
+
+		coll = bpy.data.collections.get('TestCollection')
+		child_coll = bpy.data.collections.get('ChildCollection')
+		parent = bpy.data.objects.get('ParentObj')
+		obj = bpy.data.objects.get('PlaneObj')
+
+		assert_that(coll.children, has_items(child_coll),        'Child collections loaded')
+		assert_that(coll.name,     equal_to('TestCollection'),   'Collection name loaded')
+		assert_that(coll.objects,  has_entries('PlaneObj', obj), 'Object added to collection')
+
+		assert_that(child_coll.children, empty(), 'Child collection empty')
+
+		assert_that(parent.children,      has_item(obj), 'Children loaded')
+		assert_that(parent.parent,        is_none(),     'Parent has no parent')
+		assert_that(parent.rotation_mode, equal_to('QUATERNION'),
+			'Parent roation mode loaded')
+
+		z = radians(45)
+		assert_that(obj.children,         empty(),                     'Obj has no children')
+		assert_that(obj.location,         equal_to(Vector((0, 0, 2))), 'Location loaded')
+		assert_that(obj.name,             equal_to('PlaneObj'),        'Name loaded')
+		assert_that(obj.parent,           equal_to(parent),            'Parent loaded')
+		assert_that(obj.rotation_euler,   equal_to(Euler((0, 0, z))),  'Rotation loaded')
+		assert_that(obj.rotation_mode,    equal_to('XYZ'),             'Rotation mode loaded')
+		assert_that(obj.scale,            equal_to(Vector((2, 1, 1))), 'Scale loaded')
+		issert_that(obj.users_collection, has_item(coll),              'Collections set up')
 
