@@ -372,3 +372,18 @@ def blenderMockTests():
 			equal_to(Vector((1, 2, 3))),
 			'Object scale set by components')
 
+	@it('Loading mesh from .obj file')
+	def meshFromObj():
+		bpy.set_scene_data({
+			'obj': {
+				'mesh': 'plane.obj',
+				'meshname': 'testmesh'
+			}
+		})
+
+		obj = bpy.data.objects.get('obj')
+		mesh = bpy.data.meshes.get('testmesh')
+
+		assert_that(obj.to_mesh(), equal_to(mesh), 'Mesh set on object')
+		assert_that(mesh.name, equal_to('testmesh'), 'Mesh name is set')
+

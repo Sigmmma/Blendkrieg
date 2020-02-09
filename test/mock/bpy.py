@@ -32,6 +32,16 @@ class Object:
 		self.rotation_quaternion = Quaternion() # Rotation in Quaternion coordinates
 		self.scale = Vector()          # Scale of this object
 		self.users_collection = set()  # All the collections this object belongs to
+		self._mesh = None # The mesh associated with this object
+
+	def to_mesh(self):
+		return self._mesh
+
+class Mesh:
+	def __init__(self):
+		# NOTE: Blender does not track a "triangles" field. Triangles can be
+		# derived from polygons and vertices.
+		self.name = None        # Name as it appears in Outliner
 
 
 is_mock = True # Allows tests to verify they're using the mocks
@@ -75,6 +85,18 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 
 		scale = nested[name].get('scale', Vector())
 		obj.scale = Vector((scale[0], scale[1], scale[2]))
+
+		# Load in meshes
+		meshfile = nested[name].get('mesh')
+		if meshfile:
+			meshname = nested[name].get('meshname', 'TODO: READ FROM FILE')
+
+			mesh = Mesh()
+			mesh.name = meshname
+
+			obj._mesh = mesh
+			data.meshes[meshname] = mesh
+
 
 		if parent:
 			obj.parent = parent
