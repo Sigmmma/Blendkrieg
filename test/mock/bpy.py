@@ -86,17 +86,8 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 		scale = nested[name].get('scale', Vector())
 		obj.scale = Vector((scale[0], scale[1], scale[2]))
 
-		# Load in meshes
-		meshfile = nested[name].get('mesh')
-		if meshfile:
-			meshname = nested[name].get('meshname', 'TODO: READ FROM FILE')
-
-			mesh = Mesh()
-			mesh.name = meshname
-
-			obj._mesh = mesh
-			data.meshes[meshname] = mesh
-
+		mesh = _load_mesh(nested[name])
+		obj._mesh = mesh
 
 		if parent:
 			obj.parent = parent
@@ -129,3 +120,14 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 
 		data.objects[name] = obj
 
+def _load_mesh(testobj):
+	meshfile = testobj.get('mesh')
+	if meshfile:
+		# TODO load obj in meshfile
+		meshname = testobj.get('meshname', 'TODO: READ FROM FILE')
+
+		mesh = Mesh()
+		mesh.name = meshname
+
+		data.meshes[meshname] = mesh
+		return mesh
