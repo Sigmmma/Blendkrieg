@@ -403,3 +403,18 @@ def blenderMockTests():
 		assert_that(obj2.to_mesh().name, equal_to('mesh.1'), 'Default name 2')
 		assert_that(obj3.to_mesh().name, equal_to('mesh.2'), 'Default name 3')
 
+	@it('Loading vertices from .obj file')
+	def meshVertices():
+		bpy.set_scene_data({
+			'obj': { 'mesh': 'pyramid.obj' }
+		})
+
+		mesh = bpy.data.objects.get('obj').to_mesh()
+		verts = mesh.vertices
+
+		assert_that(verts[0].co, equal_to(Vector((-1, 0,  1))), 'Vertex 0')
+		assert_that(verts[1].co, equal_to(Vector(( 1, 0,  1))), 'Vertex 1')
+		assert_that(verts[2].co, equal_to(Vector((-1, 0, -1))), 'Vertex 2')
+		assert_that(verts[3].co, equal_to(Vector(( 1, 0, -1))), 'Vertex 3')
+		assert_that(verts[4].co, equal_to(Vector(( 0, 1,  0))), 'Vertex 4')
+

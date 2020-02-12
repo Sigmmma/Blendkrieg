@@ -43,6 +43,12 @@ class Mesh:
 		# NOTE: Blender does not track a "triangles" field. Triangles can be
 		# derived from polygons and vertices.
 		self.name = None        # Name as it appears in Outliner
+		self.vertices = list()  # All vertices in this mesh
+
+class Vertex:
+	def __init__(self):
+		self.co = Vector() # The XYZ position of this vertex
+
 
 
 is_mock = True # Allows tests to verify they're using the mocks
@@ -131,6 +137,11 @@ def _load_mesh(testobj):
 		mesh = Mesh()
 		meshname = testobj.get('meshname', _unique_name('mesh'))
 		mesh.name = meshname
+
+		for v in obj.vertices:
+			vert = Vertex()
+			vert.co = Vector((v[0], v[1], v[2]))
+			mesh.vertices.append(vert)
 
 		data.meshes[meshname] = mesh
 		return mesh
