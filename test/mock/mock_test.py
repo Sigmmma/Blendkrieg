@@ -376,7 +376,7 @@ def blenderMockTests():
 	def meshFromObj():
 		bpy.set_scene_data({
 			'obj': {
-				'mesh': 'plane.obj',
+				'mesh': 'pyramid.obj',
 				'meshname': 'testmesh'
 			}
 		})
@@ -386,4 +386,20 @@ def blenderMockTests():
 
 		assert_that(obj.to_mesh(), equal_to(mesh), 'Mesh set on object')
 		assert_that(mesh.name, equal_to('testmesh'), 'Mesh name is set')
+
+	@it('Mesh names have unique defaults')
+	def meshUniqueDefaultNames():
+		bpy.set_scene_data({
+			'obj1': { 'mesh': 'pyramid.obj' },
+			'obj2': { 'mesh': 'pyramid.obj' },
+			'obj3': { 'mesh': 'pyramid.obj' }
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+		obj3 = bpy.data.objects.get('obj3')
+
+		assert_that(obj1.to_mesh().name, equal_to('mesh'), 'Default name 1')
+		assert_that(obj2.to_mesh().name, equal_to('mesh.1'), 'Default name 2')
+		assert_that(obj3.to_mesh().name, equal_to('mesh.2'), 'Default name 3')
 

@@ -8,6 +8,7 @@
 # This should, in theory, be a drop-in replacement for testing.
 
 from mathutils import Euler, Quaternion, Vector
+import pymesh
 
 class Data:
 	def __init__(self):
@@ -46,12 +47,14 @@ class Mesh:
 
 is_mock = True # Allows tests to verify they're using the mocks
 data = Data()
+name_cache = {}
 
 
 def clear_mock():
 	data.collections.clear()
 	data.meshes.clear()
 	data.objects.clear()
+	name_cache.clear()
 
 def set_scene_data(nested):
 	'''Uses a nested dictionary to create all of the objects in the scene.
@@ -123,11 +126,23 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 def _load_mesh(testobj):
 	meshfile = testobj.get('mesh')
 	if meshfile:
-		# TODO load obj in meshfile
-		meshname = testobj.get('meshname', 'TODO: READ FROM FILE')
+		obj = pymesh.load_mesh(meshfile)
 
 		mesh = Mesh()
+		meshname = testobj.get('meshname', _unique_name('mesh'))
 		mesh.name = meshname
 
 		data.meshes[meshname] = mesh
 		return mesh
+
+def _unique_name(name):
+	global name_cache
+	new_name = name
+	try:
+		count = name_cache[name]
+		new_name += '.' + str(count)
+		name_cache[name] = count + 1
+	except KeyError:
+		name_cache[name] = 1
+	return new_name
+
