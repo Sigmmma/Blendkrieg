@@ -1,3 +1,6 @@
 pocha
 pyhamcrest
 mathutils
+
+# tinyobjloader may need to be built manually from source
+tinyobjloader
