@@ -136,8 +136,7 @@ def _load_mesh(testdata):
 		geom = dae.geometries[0] # Assuming there's only one for now
 
 		mesh = Mesh()
-		# TODO read name from collada geom.name
-		meshname = testdata.get('meshname', _unique_name('mesh'))
+		meshname = testdata.get('meshname', _unique_name(geom.name))
 		mesh.name = meshname
 
 		prim = geom.primitives[0]

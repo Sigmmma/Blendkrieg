@@ -402,9 +402,9 @@ def blenderMockTests():
 		obj2 = bpy.data.objects.get('obj2')
 		obj3 = bpy.data.objects.get('obj3')
 
-		assert_that(obj1.to_mesh().name, equal_to('mesh'), 'Default name 1')
-		assert_that(obj2.to_mesh().name, equal_to('mesh.1'), 'Default name 2')
-		assert_that(obj3.to_mesh().name, equal_to('mesh.2'), 'Default name 3')
+		assert_that(obj1.to_mesh().name, equal_to('Pyramid'), 'Default name 1')
+		assert_that(obj2.to_mesh().name, equal_to('Pyramid.1'), 'Default name 2')
+		assert_that(obj3.to_mesh().name, equal_to('Pyramid.2'), 'Default name 3')
 
 	@it('Loading vertices from mesh file')
 	def meshVertices():
