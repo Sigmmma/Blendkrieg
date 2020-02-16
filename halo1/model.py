@@ -47,6 +47,8 @@ def read_halo1model(filepath):
 
 		return jms
 
+from mathutils import Vector, Quaternion
+
 def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
@@ -71,9 +73,9 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 
 	# We need to be in edit mode in order to be able to edit armatures at all.
 
-	bpy.ops.object.mode_set(mode='EDIT')
-
 	edit_bones = armature.edit_bones
+	bpy.ops.object.mode_set(mode='EDIT')
+	#pose_bones = armature.pose_position.bones
 
 	for i, node in enumerate(jms.nodes):
 		scene_node = edit_bones.new(name=NODE_NAME_PREFIX+node.name)
@@ -83,7 +85,7 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 
 		parent_children = children.setdefault(node.parent_index, dict())
 
-		# If a node has multiple children we cannot connect it's tail end to the children
+		# If a node has multiple children we cannot connect its tail end to the children
 
 		#if node.sibling_index == -1 and not len(parent_children):
 		#	scene_node.use_connect = True
@@ -92,11 +94,17 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 		rot = absolute_transforms[i]['rotation']
 
 		scene_node.head = (pos[0] * scale, pos[1] * scale, pos[2] * scale)
-		scene_node.tail = (pos[0] * scale + 0.25, pos[1] * scale, pos[2] * scale)
-		#set_rotation_from_jms(scene_node, node)
+		# Make the bone a square dimension pointing in the direction we need it to
+		# point.
+		width = scene_node.bbone_x
+		thingy = Vector((width, 0.0, 0.0))
+		thingy.rotate(rot)
+		scene_node.tail = scene_node.head + thingy
 
-		#set_translation_from_jms(scene_node, node, scale)
+		#scene_node.roll = Quaternion((-node.rot_w, node.rot_i, node.rot_j, node.rot_k)).to_euler('XYZ').y
 
+		parent_children[i] = scene_node
+		children[node.parent_index] = parent_children
 		scene_nodes[i] = scene_node
 
 	bpy.ops.object.mode_set(mode='OBJECT')
