@@ -7,6 +7,9 @@ import bpy
 # try to run tests, unless we're using the mocks.
 assert_that(bpy.is_mock, equal_to(True))
 
+# NOTE The values used in these test assertions were manually retrieved from
+# Blender's interactive Python console using the provided pyramid.blend file.
+# This is so we know we're accurately replicating Blender's functionality.
 @describe('Blender mock tests')
 def blenderMockTests():
 
@@ -372,11 +375,11 @@ def blenderMockTests():
 			equal_to(Vector((1, 2, 3))),
 			'Object scale set by components')
 
-	@it('Loading mesh from .obj file')
+	@it('Loading mesh from mesh file')
 	def meshFromObj():
 		bpy.set_scene_data({
 			'obj': {
-				'mesh': 'pyramid.obj',
+				'mesh': 'pyramid.dae',
 				'meshname': 'testmesh'
 			}
 		})
@@ -390,9 +393,9 @@ def blenderMockTests():
 	@it('Mesh names have unique defaults')
 	def meshUniqueDefaultNames():
 		bpy.set_scene_data({
-			'obj1': { 'mesh': 'pyramid.obj' },
-			'obj2': { 'mesh': 'pyramid.obj' },
-			'obj3': { 'mesh': 'pyramid.obj' }
+			'obj1': { 'mesh': 'pyramid.dae' },
+			'obj2': { 'mesh': 'pyramid.dae' },
+			'obj3': { 'mesh': 'pyramid.dae' }
 		})
 
 		obj1 = bpy.data.objects.get('obj1')
@@ -403,18 +406,18 @@ def blenderMockTests():
 		assert_that(obj2.to_mesh().name, equal_to('mesh.1'), 'Default name 2')
 		assert_that(obj3.to_mesh().name, equal_to('mesh.2'), 'Default name 3')
 
-	@it('Loading vertices from .obj file')
+	@it('Loading vertices from mesh file')
 	def meshVertices():
 		bpy.set_scene_data({
-			'obj': { 'mesh': 'pyramid.obj' }
+			'obj': { 'mesh': 'pyramid.dae' }
 		})
 
 		mesh = bpy.data.objects.get('obj').to_mesh()
 		verts = mesh.vertices
 
-		assert_that(verts[0].co, equal_to(Vector((-1, 0,  1))), 'Vertex 0')
-		assert_that(verts[1].co, equal_to(Vector(( 1, 0,  1))), 'Vertex 1')
-		assert_that(verts[2].co, equal_to(Vector((-1, 0, -1))), 'Vertex 2')
-		assert_that(verts[3].co, equal_to(Vector(( 1, 0, -1))), 'Vertex 3')
-		assert_that(verts[4].co, equal_to(Vector(( 0, 1,  0))), 'Vertex 4')
+		assert_that(verts[0].co, equal_to(Vector((-1, -1, -1))), 'Vertex 0')
+		assert_that(verts[1].co, equal_to(Vector(( 1, -1, -1))), 'Vertex 1')
+		assert_that(verts[2].co, equal_to(Vector((-1,  1, -1))), 'Vertex 2')
+		assert_that(verts[3].co, equal_to(Vector(( 1,  1, -1))), 'Vertex 3')
+		assert_that(verts[4].co, equal_to(Vector(( 0,  0,  0))), 'Vertex 4')
 

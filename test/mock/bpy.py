@@ -8,7 +8,7 @@
 # This should, in theory, be a drop-in replacement for testing.
 
 from mathutils import Euler, Quaternion, Vector
-from tinyobjloader import ObjReader, ObjReaderConfig
+from collada import Collada
 
 class Data:
 	def __init__(self):
@@ -129,33 +129,25 @@ def _add_objects(nested, parent=None, parent_colls=set()):
 
 		data.objects[name] = obj
 
-def _load_mesh(testobj):
-	meshfile = testobj.get('mesh')
+def _load_mesh(testdata):
+	meshfile = testdata.get('mesh')
 	if meshfile:
-		reader = _open_obj(meshfile)
-		attr = reader.GetAttrib()
+		dae = Collada(meshfile)
+		geom = dae.geometries[0] # Assuming there's only one for now
 
 		mesh = Mesh()
-		# TODO read name from tinyobjloader
-		meshname = testobj.get('meshname', _unique_name('mesh'))
+		# TODO read name from collada geom.name
+		meshname = testdata.get('meshname', _unique_name('mesh'))
 		mesh.name = meshname
 
-		for v in _chunk(attr.vertices, 3):
+		prim = geom.primitives[0]
+		for v in prim.vertex:
 			vert = Vertex()
 			vert.co = Vector((v[0], v[1], v[2]))
 			mesh.vertices.append(vert)
 
 		data.meshes[meshname] = mesh
 		return mesh
-
-def _open_obj(filename):
-	'''Reads in a .obj file using tinyobjloader'''
-	config = ObjReaderConfig()
-	config.triangulate = False
-	reader = ObjReader()
-	if not reader.ParseFromFile(filename, config):
-		raise Exception('Failed to load ' + filename + '\n' + reader.Error())
-	return reader
 
 def _unique_name(name):
 	'''Uses a global cache to create a unique version of the given name'''
@@ -169,6 +161,3 @@ def _unique_name(name):
 		name_cache[name] = 1
 	return new_name
 
-def _chunk(array, size):
-	for i in range(0, len(array), size):
-		yield array[i:i + size]
