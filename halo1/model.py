@@ -101,7 +101,7 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 		thingy.rotate(rot)
 		scene_node.tail = scene_node.head + thingy
 
-		#scene_node.roll = Quaternion((-node.rot_w, node.rot_i, node.rot_j, node.rot_k)).to_euler('XYZ').y
+		scene_node.roll = Quaternion((-node.rot_w, node.rot_i, node.rot_j, node.rot_k)).to_euler('XYZ').z
 
 		parent_children[i] = scene_node
 		children[node.parent_index] = parent_children
