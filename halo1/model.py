@@ -46,23 +46,56 @@ def read_halo1model(filepath):
 
 		return jms
 
+#from Blender.Mathutils import Quaternion, Vector
+
 def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
+	scene = bpy.context.collection
+	view_layer = bpy.context.view_layer
+
 	scene_nodes = dict()
+
+	# Dictionary containing all child indices for each parent.
+	children = dict()
+
+	armature = bpy.data.armatures.new('imported')
+	armature_obj = bpy.data.objects.new('imported', armature)
+
+	# We need to specifically link the object to this so we can use mode_set
+	# to set Blender to edit mode.
+
+	view_layer.active_layer_collection.collection.objects.link(armature_obj)
+	view_layer.objects.active = armature_obj
+
+	# We need to be in edit mode in order to be able to edit armatures at all.
+
+	bpy.ops.object.mode_set(mode='EDIT')
+
+	edit_bones = armature.edit_bones
+
 	for i, node in enumerate(jms.nodes):
-		scene_node = create_sphere(
-			name=NODE_NAME_PREFIX+node.name, size=node_size)
+		scene_node = edit_bones.new(name=NODE_NAME_PREFIX+node.name)
 
 		# Assign parent if index is valid.
 		scene_node.parent = scene_nodes.get(node.parent_index, None)
 
-		set_rotation_from_jms(scene_node, node)
+		parent_children = children.setdefault(node.parent_index, dict())
 
-		set_translation_from_jms(scene_node, node, scale)
+		# If a node has multiple children we cannot connect it's tail end to the children
+
+		if node.sibling_index == -1 and not len(parent_children):
+			scene_node.use_connect = True
+
+		scene_node.head = (node.pos_x * scale, node.pos_y * scale, node.pos_z * scale)
+		#set_rotation_from_jms(scene_node, node)
+
+		#set_translation_from_jms(scene_node, node, scale)
 
 		scene_nodes[i] = scene_node
+
+	bpy.ops.object.mode_set(mode='OBJECT')
 
 	return scene_nodes
 
