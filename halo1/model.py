@@ -6,11 +6,12 @@ from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
 
-from ..constants import ( JMS_VERSION_HALO_1, NODE_NAME_PREFIX, MARKER_NAME_PREFIX )
+from ..constants import (JMS_VERSION_HALO_1, NODE_NAME_PREFIX,
+	MARKER_NAME_PREFIX)
 from ..scene.shapes import create_sphere
-from ..scene.util import set_uniform_scale, reduce_vertices
-from ..scene.jms_util import ( set_rotation_from_jms,
-	set_translation_from_jms )
+from ..scene.util import (set_uniform_scale, reduce_vertices)
+from ..scene.jms_util import (set_rotation_from_jms,
+	set_translation_from_jms, get_absolute_node_transforms_from_jms)
 
 def read_halo1model(filepath):
 	'''Takes a halo1 model file and turns it into a jms object.'''
@@ -46,16 +47,15 @@ def read_halo1model(filepath):
 
 		return jms
 
-#from Blender.Mathutils import Quaternion, Vector
-
 def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
-	scene = bpy.context.collection
 	view_layer = bpy.context.view_layer
 
 	scene_nodes = dict()
+
+	absolute_transforms = get_absolute_node_transforms_from_jms(jms.nodes)
 
 	# Dictionary containing all child indices for each parent.
 	children = dict()
@@ -85,10 +85,14 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 
 		# If a node has multiple children we cannot connect it's tail end to the children
 
-		if node.sibling_index == -1 and not len(parent_children):
-			scene_node.use_connect = True
+		#if node.sibling_index == -1 and not len(parent_children):
+		#	scene_node.use_connect = True
 
-		scene_node.head = (node.pos_x * scale, node.pos_y * scale, node.pos_z * scale)
+		pos = absolute_transforms[i]['translation']
+		rot = absolute_transforms[i]['rotation']
+
+		scene_node.head = (pos[0] * scale, pos[1] * scale, pos[2] * scale)
+		scene_node.tail = (pos[0] * scale + 0.25, pos[1] * scale, pos[2] * scale)
 		#set_rotation_from_jms(scene_node, node)
 
 		#set_translation_from_jms(scene_node, node, scale)
