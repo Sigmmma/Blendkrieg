@@ -113,5 +113,8 @@ lib/*
 # vim temp files
 *.swp
 
+# Blender backup (?) files
+*.blend1
+
 # Mia's local notes
 notes.txt

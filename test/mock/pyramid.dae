@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.80.75</authoring_tool>
     </contributor>
-    <created>2020-02-16T08:05:43</created>
-    <modified>2020-02-16T08:05:43</modified>
+    <created>2020-02-17T06:36:57</created>
+    <modified>2020-02-17T06:36:57</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -49,9 +49,9 @@
           </technique_common>
         </source>
         <source id="Pyramid-mesh-normals">
-          <float_array id="Pyramid-mesh-normals-array" count="18">0 0 1 0.4082483 0.4082483 0.8164967 -0.4082483 0.4082483 0.8164967 -0.4082483 -0.4082483 0.8164967 0.4082483 -0.4082483 0.8164967 0 0 -1</float_array>
+          <float_array id="Pyramid-mesh-normals-array" count="15">0 0 1 0.6891064 0.6891064 -0.2241984 -0.6891064 0.6891064 -0.2241984 -0.6891064 -0.6891064 -0.2241984 0.6891064 -0.6891064 -0.2241984</float_array>
           <technique_common>
-            <accessor source="#Pyramid-mesh-normals-array" count="6" stride="3">
+            <accessor source="#Pyramid-mesh-normals-array" count="5" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
@@ -75,7 +75,7 @@
           <input semantic="NORMAL" source="#Pyramid-mesh-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#Pyramid-mesh-map-0" offset="2" set="0"/>
           <vcount>3 3 3 3 4 </vcount>
-          <p>4 0 0 3 1 1 2 2 2 4 0 3 2 2 4 0 3 5 1 4 6 4 0 7 0 3 8 1 4 9 3 1 10 4 0 11 0 5 12 2 5 13 3 5 14 1 5 15</p>
+          <p>4 0 0 3 1 1 2 2 2 4 0 3 2 2 4 0 3 5 1 4 6 4 0 7 0 3 8 1 4 9 3 1 10 4 0 11 0 3 12 2 2 13 3 1 14 1 4 15</p>
         </polylist>
       </mesh>
     </geometry>

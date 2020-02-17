@@ -47,7 +47,8 @@ class Mesh:
 
 class Vertex:
 	def __init__(self):
-		self.co = Vector() # The XYZ position of this vertex
+		self.co = Vector()     # The XYZ position of this vertex
+		self.normal = Vector() # The XYZ normal of this vertex
 
 
 
@@ -140,10 +141,28 @@ def _load_mesh(testdata):
 		mesh.name = meshname
 
 		prim = geom.primitives[0]
+
+		# Collada vertex position order matches Blender
 		for v in prim.vertex:
 			vert = Vertex()
 			vert.co = Vector((v[0], v[1], v[2]))
 			mesh.vertices.append(vert)
+
+		# Collada vertex normal order DOES NOT match Blender, however,
+		# the vertex_index and normal_index lists both refer to the same
+		# vertices in the same order. We can use that fact to figure out which
+		# normals belong to which vertex.
+		#
+		# Example: normal 4 maps to vertex 2, 1->3, 2->1, etc...
+		#   vertex_index: [2, 3, 1, 4, 0]
+		#   normal_index: [4, 1, 2, 0, 3]
+		normal_vertex_map = {}
+		for x in range(len(prim.normal_index)):
+			normal_vertex_map[prim.normal_index[x]] = prim.vertex_index[x]
+
+		for idx, n in enumerate(prim.normal):
+			vert = mesh.vertices[normal_vertex_map[idx]]
+			vert.normal = Vector((n[0], n[1], n[2]))
 
 		data.meshes[meshname] = mesh
 		return mesh

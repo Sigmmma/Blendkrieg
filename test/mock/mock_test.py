@@ -421,3 +421,20 @@ def blenderMockTests():
 		assert_that(verts[3].co, equal_to(Vector(( 1,  1, -1))), 'Vertex 3')
 		assert_that(verts[4].co, equal_to(Vector(( 0,  0,  0))), 'Vertex 4')
 
+	@it('Loading vertex normals from mesh file')
+	def meshSmoothingGroups():
+		bpy.set_scene_data({
+			'obj': { 'mesh': 'pyramid.dae' }
+		})
+
+		mesh = bpy.data.objects.get('obj').to_mesh()
+		vs = mesh.vertices
+
+		x = 0.6891064  # Unpack these values to shorten assertions
+		y = 0.2241984
+		assert_that(vs[0].normal, equal_to(Vector((-x, -x, -y))), 'Normal 0')
+		assert_that(vs[1].normal, equal_to(Vector(( x, -x, -y))), 'Normal 1')
+		assert_that(vs[2].normal, equal_to(Vector((-x,  x, -y))), 'Normal 2')
+		assert_that(vs[3].normal, equal_to(Vector(( x,  x, -y))), 'Normal 3')
+		assert_that(vs[4].normal, equal_to(Vector(( 0,  0,  1))), 'Normal 4')
+
