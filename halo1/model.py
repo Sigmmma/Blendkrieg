@@ -95,23 +95,21 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes=
 
 		# Then we add the absolute location to both the head and the tail.
 
-		base_pos = scene_node.head
-		scene_node.head = (base_pos.x + pos[0] * scale, base_pos.y + pos[1] * scale, base_pos.z + pos[2] * scale)
-		base_tail = scene_node.tail
-		scene_node.tail = (base_tail.x + pos[0] * scale, base_tail.y + pos[1] * scale, base_tail.z + pos[2] * scale)
+		scene_node.head += Vector(
+			(pos[0] * scale, pos[1] * scale, pos[2] * scale))
+		scene_node.tail += Vector(
+			(pos[0] * scale, pos[1] * scale, pos[2] * scale))
 
 		# Store the info we gathered this cycle.
 		scene_nodes[i] = scene_node
 
 	# Collect all the bone prefixes that need to be attached in a tuple.
-
 	attach_bones = ()
 	for k in extend_nodes:
 		if extend_nodes[k]:
 			attach_bones += (k,)
 
 	# Attach all the bones that we should attach if we can safely do so.
-
 	for bone in armature.edit_bones:
 		children = bone.children
 
@@ -127,6 +125,7 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes=
 			# Connect the bone so it stays attached when editing.
 			children[0].use_connect = True
 
+	# Change back to object mode so the rest of the script can execute properly.
 
 	bpy.ops.object.mode_set(mode='OBJECT')
 
