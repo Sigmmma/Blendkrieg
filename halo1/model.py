@@ -60,7 +60,7 @@ def import_halo1_nodes_from_jms(jms, *,
 	Import all the nodes from a jms into the scene as an armature and returns
 	a dict of them.
 
-	node_size are is currently unused and may be depricated.
+	node_size is currently unused and may be depricated.
 
 	max_attachment_distance is the max distance a bone may deviate from
 	the line that signifies the direction of the parent.
