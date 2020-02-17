@@ -85,7 +85,8 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 
 		parent_children = children.setdefault(node.parent_index, dict())
 
-		# If a node has multiple children we cannot connect its tail end to the children
+		# If a node has multiple children we cannot connect its tail end
+		# to the children.
 
 		#if node.sibling_index == -1 and not len(parent_children):
 		#	scene_node.use_connect = True
@@ -93,16 +94,23 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 		pos = absolute_transforms[i]['translation']
 		rot = absolute_transforms[i]['rotation']
 
-		scene_node.head = (pos[0] * scale, pos[1] * scale, pos[2] * scale)
-		# Make the bone a square dimension pointing in the direction we need it to
-		# point.
-		width = scene_node.bbone_x
-		thingy = Vector((width, 0.0, 0.0))
-		thingy.rotate(rot)
-		scene_node.tail = scene_node.head + thingy
+		# Bones when created start at 0 0 0 for their tail and head.
+		# We extend the tail so it sticks out a bit and signifies the direction.
 
-		# We need a roll, but this one is wrong. As long as we can't figure out a proper roll we're doomed.
-		scene_node.roll = Quaternion((-node.rot_w, node.rot_i, node.rot_j, node.rot_k)).to_euler('XYZ').z
+		scene_node.tail = (scene_node.bbone_x, 0.0, 0.0)
+
+		# We then rotate the bone by the absolute rotation that it should have.
+
+		scene_node.transform(rot.to_matrix(), scale=False)
+
+		# Then we add the absolute location to both the head and the tail.
+
+		base_pos = scene_node.head
+		scene_node.head = (base_pos.x + pos[0] * scale, base_pos.y + pos[1] * scale, base_pos.z + pos[2] * scale)
+		base_tail = scene_node.tail
+		scene_node.tail = (base_tail.x + pos[0] * scale, base_tail.y + pos[1] * scale, base_tail.z + pos[2] * scale)
+
+		# Store the info we gathered this cycle.
 
 		parent_children[i] = scene_node
 		children[node.parent_index] = parent_children
