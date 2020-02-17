@@ -57,7 +57,16 @@ def import_halo1_nodes_from_jms(jms, *,
 		max_attachment_distance=0.00001,
 		attach_bones=('bip01',)):
 	'''
-	Import all the nodes from a jms into the scene and returns a dict of them.
+	Import all the nodes from a jms into the scene as an armature and returns
+	a dict of them.
+
+	node_size are is currently unused and may be depricated.
+
+	max_attachment_distance is the max distance a bone may deviate from
+	the line that signifies the direction of the parent.
+
+	attach_bones is a tuple of prefixes that this function should attempt to
+	connect.
 	'''
 	view_layer = bpy.context.view_layer
 
@@ -122,12 +131,17 @@ def import_halo1_nodes_from_jms(jms, *,
 		direction.rotate(rot)
 		directions[scene_node.name] = direction
 
+	if len(attach_bones) > 0:
+		print('Checking if any bones with the prefixes %s can be connected.\n' %
+				(attach_bones,))
+
 	# Attach all the bones that we should attach if we can safely do so.
 	for bone in armature.edit_bones:
 		children = bone.children
 
 		if (len(children) == 1 # Can't connect to multiple children, so don't.
-		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)):
+		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)
+		and children[0].name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)):
 			child_head = children[0].head
 
 			distance = point_distance_to_line(
