@@ -17,6 +17,7 @@ def blenderMockTests():
 	def verifyEmpty():
 		bpy.clear_mock()
 		assert_that(bpy.data.collections, empty())
+		assert_that(bpy.data.materials, empty())
 		assert_that(bpy.data.meshes, empty())
 		assert_that(bpy.data.objects, empty())
 
@@ -472,4 +473,23 @@ def blenderMockTests():
 		assert_that(uvs[13].uv, equal_to(Vector((1.0, 0.0))), 'UV 13')
 		assert_that(uvs[14].uv, equal_to(Vector((0.0, 0.0))), 'UV 14')
 		assert_that(uvs[15].uv, equal_to(Vector((0.0, 1.0))), 'UV 15')
+
+	@it('Loading materials from mesh file')
+	def meshMaterials():
+		bpy.set_scene_data({
+			'obj': { 'mesh': 'pyramid.dae' }
+		})
+
+		mesh = bpy.data.meshes.get('Pyramid')
+		mat = bpy.data.materials.get('Pyramid')
+
+		assert_that(mesh.materials,
+			has_entry('Pyramid', mat),
+			'Mesh has material set')
+
+		assert_that(mat.diffuse_color,
+			equal_to((1, 0, 0, 1)),
+			'Material diffuse color set')
+
+		assert_that(mat.name, equal_to('Pyramid'), 'Material name set')
 

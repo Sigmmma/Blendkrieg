@@ -13,6 +13,7 @@ from collada import Collada
 class Data:
 	def __init__(self):
 		self.collections = dict() # All the collections in the scene
+		self.materials = dict()   # All the materials in the scene
 		self.meshes = dict()      # All the mesh objects in the scene
 		self.objects = dict()     # All the objects in the scene
 
@@ -42,6 +43,7 @@ class Mesh:
 	def __init__(self):
 		# NOTE: Blender does not track a "triangles" field. Triangles can be
 		# derived from polygons and vertices.
+		self.materials = dict() # All materials applied to this mesh
 		self.name = None        # Name as it appears in Outliner
 		self.uv_layers = dict() # This mesh's UVW map. NOTE: Blender can have
 		                        # several of these, but we only support one.
@@ -61,6 +63,10 @@ class MeshUVLoop:
 	def __init__(self):
 		self.uv = Vector() # The UV coordinate for this UV Loop
 
+class Material:
+	def __init__(self):
+		self.diffuse_color = (1, 1, 1, 1) # Color in RGBA
+		self.name = None                  # Name as it appears in Outliner
 
 
 is_mock = True # Allows tests to verify they're using the mocks
@@ -71,6 +77,7 @@ _name_cache = {}
 
 def clear_mock():
 	data.collections.clear()
+	data.materials.clear()
 	data.meshes.clear()
 	data.objects.clear()
 
@@ -188,6 +195,20 @@ def _load_mesh(testdata):
 
 		# Blender supports multiple UV layers but we're only supporting one.
 		mesh.uv_layers['Test'] = uvlayer
+
+		# Load in materials
+		for m in dae.materials:
+			mat = Material()
+			mat.name = m.name
+			dif = m.effect.diffuse
+			mat.diffuse_color = (dif[0], dif[1], dif[2], dif[3])
+
+			data.materials[m.name] = mat
+			# TODO we're assuming every material belongs to this mesh.
+			# That's not right but it'll do for now.
+			mesh.materials[m.name] = mat
+
+		# TODO face material assignments
 
 		data.meshes[meshname] = mesh
 		return mesh
