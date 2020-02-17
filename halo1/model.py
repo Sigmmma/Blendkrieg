@@ -55,7 +55,7 @@ def import_halo1_nodes_from_jms(jms, *,
 		scale=1.0,
 		node_size=0.02,
 		max_attachment_distance=0.00001,
-		attach_nodes={'bip01': True, 'frame': False}):
+		attach_bones=('bip01',)):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
@@ -121,13 +121,6 @@ def import_halo1_nodes_from_jms(jms, *,
 		direction = Vector((1000.0, 0.0, 0.0))
 		direction.rotate(rot)
 		directions[scene_node.name] = direction
-
-	# Collect all the bone prefixes that need to be attached in a tuple.
-	attach_bones = ()
-	if max_attachment_distance >= 0:
-		for k in attach_nodes:
-			if attach_nodes[k]:
-				attach_bones += (k,)
 
 	# Attach all the bones that we should attach if we can safely do so.
 	for bone in armature.edit_bones:
