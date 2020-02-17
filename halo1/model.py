@@ -103,6 +103,31 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes=
 		# Store the info we gathered this cycle.
 		scene_nodes[i] = scene_node
 
+	# Collect all the bone prefixes that need to be attached in a tuple.
+
+	attach_bones = ()
+	for k in extend_nodes:
+		if extend_nodes[k]:
+			attach_bones += (k,)
+
+	# Attach all the bones that we should attach if we can safely do so.
+
+	for bone in armature.edit_bones:
+		children = bone.children
+
+		if len(children) == 1 # Can't connect to multiple children, so don't.
+		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones):
+			# TODO: We need to check if the child node is on the same line as
+			# the parent. Otherwise this will break.
+
+			# If the child bone's head is on a line with the parent's tail
+			# direction we can set the parent tail to the location of the child
+			# head.
+			bone.tail = children[0].head
+			# Connect the bone so it stays attached when editing.
+			children[0].use_connect = True
+
+
 	bpy.ops.object.mode_set(mode='OBJECT')
 
 	return scene_nodes
