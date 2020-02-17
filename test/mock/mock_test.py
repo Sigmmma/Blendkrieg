@@ -415,6 +415,8 @@ def blenderMockTests():
 		mesh = bpy.data.objects.get('obj').to_mesh()
 		verts = mesh.vertices
 
+		assert_that(verts, has_length(5), 'Read in expected number of vertices')
+
 		assert_that(verts[0].co, equal_to(Vector((-1, -1, -1))), 'Vertex 0')
 		assert_that(verts[1].co, equal_to(Vector(( 1, -1, -1))), 'Vertex 1')
 		assert_that(verts[2].co, equal_to(Vector((-1,  1, -1))), 'Vertex 2')
@@ -429,6 +431,8 @@ def blenderMockTests():
 
 		mesh = bpy.data.objects.get('obj').to_mesh()
 		vs = mesh.vertices
+
+		assert_that(vs, has_length(5), 'Read in expected number of vertices')
 
 		x = 0.6891064  # Unpack these values to shorten assertions
 		y = 0.2241984
