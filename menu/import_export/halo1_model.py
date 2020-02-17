@@ -99,9 +99,10 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		name = os.path.basename(os.path.splitext(self.filepath)[0])
 
 		# Import nodes into the scene.
-		nodes = import_halo1_nodes_from_jms(jms, scale=scale, node_size=self.node_size)
-		#import_halo1_markers_from_jms(jms, scale=scale,
-		#	node_size=self.marker_size, scene_nodes=nodes)
+		armature, nodes = import_halo1_nodes_from_jms(jms, scale=scale, node_size=self.node_size)
+		# Import markers.
+		import_halo1_markers_from_jms(jms, scale=scale,
+			node_size=self.marker_size, armature=armature, scene_nodes=nodes)
 
 		import_halo1_all_regions_from_jms(jms, name=name, scale=scale)
 

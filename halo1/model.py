@@ -67,6 +67,8 @@ def import_halo1_nodes_from_jms(jms, *,
 
 	attach_bones is a tuple of prefixes that this function should attempt to
 	connect.
+
+	Returns the armature object and a dict of index - bone pairs.
 	'''
 	view_layer = bpy.context.view_layer
 
@@ -163,9 +165,9 @@ def import_halo1_nodes_from_jms(jms, *,
 
 	bpy.ops.object.mode_set(mode='OBJECT')
 
-	return scene_nodes
+	return armature_obj, scene_nodes
 
-def import_halo1_markers_from_jms(jms, *, scale=1.0, node_size=0.01,
+def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.01,
 		scene_nodes=dict(), import_radius=False,
 		permutation_filter=(), region_filter=()
 		):
@@ -208,7 +210,11 @@ def import_halo1_markers_from_jms(jms, *, scale=1.0, node_size=0.01,
 			set_uniform_scale(scene_marker, marker.radius)
 
 		# Assign parent if index is valid.
-		scene_marker.parent = scene_nodes.get(marker.parent, None)
+		parent = scene_nodes.get(marker.parent, None)
+		if armature and parent:
+			scene_marker.parent = armature
+			scene_marker.parent_type = 'BONE'
+			scene_marker.parent_bone = parent.name
 
 		set_rotation_from_jms(scene_marker, marker)
 
