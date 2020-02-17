@@ -47,9 +47,8 @@ def read_halo1model(filepath):
 
 		return jms
 
-from mathutils import Vector, Quaternion
 
-def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
+def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes={'bip01': True, 'frame': False}):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
@@ -58,9 +57,6 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 	scene_nodes = dict()
 
 	absolute_transforms = get_absolute_node_transforms_from_jms(jms.nodes)
-
-	# Dictionary containing all child indices for each parent.
-	children = dict()
 
 	armature = bpy.data.armatures.new('imported')
 	armature_obj = bpy.data.objects.new('imported', armature)
@@ -75,7 +71,6 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 
 	edit_bones = armature.edit_bones
 	bpy.ops.object.mode_set(mode='EDIT')
-	#pose_bones = armature.pose_position.bones
 
 	for i, node in enumerate(jms.nodes):
 		scene_node = edit_bones.new(name=NODE_NAME_PREFIX+node.name)
@@ -83,13 +78,8 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 		# Assign parent if index is valid.
 		scene_node.parent = scene_nodes.get(node.parent_index, None)
 
-		parent_children = children.setdefault(node.parent_index, dict())
-
 		# If a node has multiple children we cannot connect its tail end
 		# to the children.
-
-		#if node.sibling_index == -1 and not len(parent_children):
-		#	scene_node.use_connect = True
 
 		pos = absolute_transforms[i]['translation']
 		rot = absolute_transforms[i]['rotation']
@@ -111,9 +101,6 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02):
 		scene_node.tail = (base_tail.x + pos[0] * scale, base_tail.y + pos[1] * scale, base_tail.z + pos[2] * scale)
 
 		# Store the info we gathered this cycle.
-
-		parent_children[i] = scene_node
-		children[node.parent_index] = parent_children
 		scene_nodes[i] = scene_node
 
 	bpy.ops.object.mode_set(mode='OBJECT')
