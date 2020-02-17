@@ -65,14 +65,16 @@ class MeshUVLoop:
 
 is_mock = True # Allows tests to verify they're using the mocks
 data = Data()
-name_cache = {}
+
+_name_cache = {}
 
 
 def clear_mock():
 	data.collections.clear()
 	data.meshes.clear()
 	data.objects.clear()
-	name_cache.clear()
+
+	_name_cache.clear()
 
 def set_scene_data(nested):
 	'''Uses a nested dictionary to create all of the objects in the scene.
@@ -192,13 +194,13 @@ def _load_mesh(testdata):
 
 def _unique_name(name):
 	'''Uses a global cache to create a unique version of the given name'''
-	global name_cache
+	global _name_cache
 	new_name = name
 	try:
-		count = name_cache[name]
+		count = _name_cache[name]
 		new_name += '.' + str(count)
-		name_cache[name] = count + 1
+		_name_cache[name] = count + 1
 	except KeyError:
-		name_cache[name] = 1
+		_name_cache[name] = 1
 	return new_name
 
