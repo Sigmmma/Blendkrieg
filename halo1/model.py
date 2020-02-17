@@ -5,6 +5,7 @@ from reclaimer.hek.defs.mode import mode_def
 from reclaimer.hek.defs.mod2 import mod2_def
 from reclaimer.model.jms import read_jms
 from reclaimer.model.model_decompilation import extract_model
+from reclaimer.util.geometry import point_distance_to_line
 
 from ..constants import (JMS_VERSION_HALO_1, NODE_NAME_PREFIX,
 	MARKER_NAME_PREFIX)
@@ -48,7 +49,13 @@ def read_halo1model(filepath):
 		return jms
 
 
-def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes={'bip01': True, 'frame': False}):
+from mathutils import Vector
+
+def import_halo1_nodes_from_jms(jms, *,
+		scale=1.0,
+		node_size=0.02,
+		max_attachment_distance=0.00001,
+		attach_nodes={'bip01': True, 'frame': False}):
 	'''
 	Import all the nodes from a jms into the scene and returns a dict of them.
 	'''
@@ -71,6 +78,12 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes=
 
 	edit_bones = armature.edit_bones
 	bpy.ops.object.mode_set(mode='EDIT')
+
+	# "directions" of where each node is pointing for the attachment progress.
+	# These really are just points that are offset 1000 units in the direction
+	# the node is pointing from the point of the node's in scene head.
+	# These are used so we can check if two bones should be attached.
+	directions = {}
 
 	for i, node in enumerate(jms.nodes):
 		scene_node = edit_bones.new(name=NODE_NAME_PREFIX+node.name)
@@ -103,27 +116,41 @@ def import_halo1_nodes_from_jms(jms, *, scale=1.0, node_size=0.02, extend_nodes=
 		# Store the info we gathered this cycle.
 		scene_nodes[i] = scene_node
 
+		# Store a "direction" for this node
+
+		direction = Vector((1000.0, 0.0, 0.0))
+		direction.rotate(rot)
+		directions[scene_node.name] = direction
+
 	# Collect all the bone prefixes that need to be attached in a tuple.
 	attach_bones = ()
-	for k in extend_nodes:
-		if extend_nodes[k]:
-			attach_bones += (k,)
+	if max_attachment_distance >= 0:
+		for k in attach_nodes:
+			if attach_nodes[k]:
+				attach_bones += (k,)
 
 	# Attach all the bones that we should attach if we can safely do so.
 	for bone in armature.edit_bones:
 		children = bone.children
 
-		if len(children) == 1 # Can't connect to multiple children, so don't.
-		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones):
-			# TODO: We need to check if the child node is on the same line as
-			# the parent. Otherwise this will break.
+		if (len(children) == 1 # Can't connect to multiple children, so don't.
+		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)):
+			child_head = children[0].head
 
-			# If the child bone's head is on a line with the parent's tail
-			# direction we can set the parent tail to the location of the child
-			# head.
-			bone.tail = children[0].head
-			# Connect the bone so it stays attached when editing.
-			children[0].use_connect = True
+			distance = point_distance_to_line(
+				child_head,
+				(bone.head, directions[bone.name]),
+				use_double_rounding=False)
+
+			if distance < max_attachment_distance:
+				print("Connecting %r to %r with distance %.12f" %
+						(children[0].name, bone.name, distance))
+				# If the child bone's head is on a line with the parent's tail
+				# direction we can set the parent tail to the location of the
+				# child head.
+				bone.tail = child_head
+				# Connect the bone so it stays attached when editing.
+				children[0].use_connect = True
 
 	# Change back to object mode so the rest of the script can execute properly.
 
