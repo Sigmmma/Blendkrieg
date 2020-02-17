@@ -43,12 +43,23 @@ class Mesh:
 		# NOTE: Blender does not track a "triangles" field. Triangles can be
 		# derived from polygons and vertices.
 		self.name = None        # Name as it appears in Outliner
+		self.uv_layers = dict() # This mesh's UVW map. NOTE: Blender can have
+		                        # several of these, but we only support one.
 		self.vertices = list()  # All vertices in this mesh
 
 class Vertex:
 	def __init__(self):
 		self.co = Vector()     # The XYZ position of this vertex
 		self.normal = Vector() # The XYZ normal of this vertex
+
+class MeshUVLoopLayer:
+	def __init__(self):
+		self.data = list() # The list of UVLoops in this UV layer
+		self.name = None   # The name of this UV layer
+
+class MeshUVLoop:
+	def __init__(self):
+		self.uv = Vector() # The UV coordinate for this UV Loop
 
 
 
@@ -163,6 +174,18 @@ def _load_mesh(testdata):
 		for idx, n in enumerate(prim.normal):
 			vert = mesh.vertices[normal_vertex_map[idx]]
 			vert.normal = Vector((n[0], n[1], n[2]))
+
+		# Texture coordinate order fortunately does match Blender
+		uvlayer = MeshUVLoopLayer()
+		uvlayer.name = 'Test'
+		uvlayer.data = []
+		for t in prim.texcoordset[0]:
+			tex = MeshUVLoop()
+			tex.uv = Vector((t[0], t[1]))
+			uvlayer.data.append(tex)
+
+		# Blender supports multiple UV layers but we're only supporting one.
+		mesh.uv_layers['Test'] = uvlayer
 
 		data.meshes[meshname] = mesh
 		return mesh

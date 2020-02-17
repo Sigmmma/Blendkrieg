@@ -438,3 +438,33 @@ def blenderMockTests():
 		assert_that(vs[3].normal, equal_to(Vector(( x,  x, -y))), 'Normal 3')
 		assert_that(vs[4].normal, equal_to(Vector(( 0,  0,  1))), 'Normal 4')
 
+	@it('Loading texture mapping from mesh file')
+	def meshTextureMapping():
+		bpy.set_scene_data({
+			'obj': { 'mesh': 'pyramid.dae' }
+		})
+
+		mesh = bpy.data.objects.get('obj').to_mesh()
+
+		assert_that(mesh.uv_layers, has_key('Test'), 'Mesh UV Layer set up')
+
+		uvs = mesh.uv_layers['Test'].data
+
+		assert_that(uvs, has_length(16), 'Read in expected number of UV Loops')
+		assert_that(uvs[ 0].uv, equal_to(Vector((0.5, 0.5))), 'UV  0')
+		assert_that(uvs[ 1].uv, equal_to(Vector((0.0, 0.0))), 'UV  1')
+		assert_that(uvs[ 2].uv, equal_to(Vector((1.0, 0.0))), 'UV  2')
+		assert_that(uvs[ 3].uv, equal_to(Vector((0.5, 0.5))), 'UV  3')
+		assert_that(uvs[ 4].uv, equal_to(Vector((1.0, 0.0))), 'UV  4')
+		assert_that(uvs[ 5].uv, equal_to(Vector((1.0, 1.0))), 'UV  5')
+		assert_that(uvs[ 6].uv, equal_to(Vector((0.0, 1.0))), 'UV  6')
+		assert_that(uvs[ 7].uv, equal_to(Vector((0.5, 0.5))), 'UV  7')
+		assert_that(uvs[ 8].uv, equal_to(Vector((1.0, 1.0))), 'UV  8')
+		assert_that(uvs[ 9].uv, equal_to(Vector((0.0, 1.0))), 'UV  9')
+		assert_that(uvs[10].uv, equal_to(Vector((0.0, 0.0))), 'UV 10')
+		assert_that(uvs[11].uv, equal_to(Vector((0.5, 0.5))), 'UV 11')
+		assert_that(uvs[12].uv, equal_to(Vector((1.0, 1.0))), 'UV 12')
+		assert_that(uvs[13].uv, equal_to(Vector((1.0, 0.0))), 'UV 13')
+		assert_that(uvs[14].uv, equal_to(Vector((0.0, 0.0))), 'UV 14')
+		assert_that(uvs[15].uv, equal_to(Vector((0.0, 1.0))), 'UV 15')
+
