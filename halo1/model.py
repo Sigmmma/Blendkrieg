@@ -1,5 +1,8 @@
 import bpy
 import itertools
+import math
+
+from mathutils import Euler
 
 from reclaimer.hek.defs.mode import mode_def
 from reclaimer.hek.defs.mod2 import mod2_def
@@ -209,6 +212,10 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 		if import_radius:
 			set_uniform_scale(scene_marker, marker.radius)
 
+		set_rotation_from_jms(scene_marker, marker)
+
+		set_translation_from_jms(scene_marker, marker, scale)
+
 		# Assign parent if index is valid.
 		parent = scene_nodes.get(marker.parent, None)
 		if armature and parent:
@@ -216,9 +223,14 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 			scene_marker.parent_type = 'BONE'
 			scene_marker.parent_bone = parent.name
 
-		set_rotation_from_jms(scene_marker, marker)
+			# Ajust location for difference in forward axis between Halo
+			# and Blender bones.
+			scene_marker.location.rotate(Euler((0.0, 0.0, math.radians(90.0))))
+			# Adjust location for being parented to the tail end of the bone
+			# rather than the head end.
+			scene_marker.location.y -= parent.length
 
-		set_translation_from_jms(scene_marker, marker, scale)
+
 
 	#TODO: Should this return something?
 
