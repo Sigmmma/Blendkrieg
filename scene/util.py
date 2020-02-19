@@ -3,6 +3,8 @@ Functions for interfacing Halo stuff with the Blender scene.
 '''
 import itertools
 
+from mathutils import Vector
+
 def set_rotation(scene_object, *, i=0.0, j=0.0, k=0.0, w=-1.0):
 	'''
 	Helper to apply a rotation from Halo to an object in the scene.
@@ -97,3 +99,16 @@ def reduce_vertices(verts, tris):
 
 	# Return as tuples because they are nice and fast.
 	return tuple(new_verts), tuple(new_tris)
+
+def trace_into_direction(direction, distance=10000.0):
+	'''
+	Creates a point at (default) 10000 units into the given direction.
+	Supports Euler, Quaternion, Matrix.
+	'''
+	# First we create the point at the distance we want it.
+	point = Vector((distance, 0.0, 0.0))
+	# Then we rotate it from the 0 0 0 point so it's in the direction given
+	# as a function input.
+	point.rotate(direction)
+
+	return point

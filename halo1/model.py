@@ -13,7 +13,7 @@ from reclaimer.util.geometry import point_distance_to_line
 from ..constants import (JMS_VERSION_HALO_1, NODE_NAME_PREFIX,
 	MARKER_NAME_PREFIX)
 from ..scene.shapes import create_sphere
-from ..scene.util import (set_uniform_scale, reduce_vertices)
+from ..scene.util import (set_uniform_scale, reduce_vertices, trace_into_direction)
 from ..scene.jms_util import (set_rotation_from_jms,
 	set_translation_from_jms, get_absolute_node_transforms_from_jms)
 
@@ -112,9 +112,10 @@ def import_halo1_nodes_from_jms(jms, *,
 		rot = absolute_transforms[i]['rotation']
 
 		# Bones when created start at 0 0 0 for their tail and head.
-		# We extend the tail so it sticks out a bit and signifies the direction.
+		# We set the X of the tail, so it's not 0 length.
+		# X also is the forward direction for Halo bones.
 
-		scene_node.tail = (scene_node.bbone_x, 0.0, 0.0)
+		scene_node.tail.x = 0.2
 
 		# We then rotate the bone by the absolute rotation that it should have.
 
@@ -131,10 +132,7 @@ def import_halo1_nodes_from_jms(jms, *,
 		scene_nodes[i] = scene_node
 
 		# Store a "direction" for this node
-
-		direction = Vector((1000.0, 0.0, 0.0))
-		direction.rotate(rot)
-		directions[scene_node.name] = direction
+		directions[scene_node.name] = trace_into_direction(rot)
 
 	if len(attach_bones) > 0:
 		print('Checking if any bones with the prefixes %s can be connected.\n' %
