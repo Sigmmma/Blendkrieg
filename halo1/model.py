@@ -138,13 +138,16 @@ def import_halo1_nodes_from_jms(jms, *,
 		print('Checking if any bones with the prefixes %s can be connected.\n' %
 				(attach_bones,))
 
+	# Add the node prefix to in-tag prefixes that we should attempt to connect.
+	attach_bones = tuple(map(lambda p : NODE_NAME_PREFIX + p, attach_bones))
+
 	# Attach all the bones that we should attach if we can safely do so.
 	for bone in armature.edit_bones:
 		children = bone.children
 
 		if (len(children) == 1 # Can't connect to multiple children, so don't.
-		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)
-		and children[0].name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)):
+		and bone.name.startswith(attach_bones)
+		and children[0].name.startswith(attach_bones)):
 			child = children[0]
 
 			distance = point_distance_to_line(
@@ -233,8 +236,6 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 			# base. But when attaching in Blender its 0 0 0 is instead at the
 			# bone's tail end.
 			scene_marker.location.y -= parent.length
-
-
 
 	#TODO: Should this return something?
 
