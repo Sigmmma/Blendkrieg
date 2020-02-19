@@ -271,6 +271,18 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 		triangles
 	)
 
+	# Collect UVs
+
+	vert_uvs = tuple(map(lambda v : (v.tex_u, v.tex_v), jms.verts))
+
+	tri_uvs = tuple(map(
+		lambda t : (
+			vert_uvs[t[0]],
+			vert_uvs[t[1]],
+			vert_uvs[t[2]]),
+		triangles
+	))
+
 	# Remove unused vertices
 	vertices, triangles = reduce_vertices(vertices, triangles)
 
@@ -282,6 +294,8 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 	# Loops are the points of triangles so to speak.
 
 	loop_normals = tuple(itertools.chain(*tri_normals))
+
+	loop_uvs = tuple(itertools.chain(*tri_uvs))
 
 	### Importing the data into a mesh
 
@@ -298,6 +312,11 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 	# Setting this to true makes Blender display the custom normals.
 	# It feels really wrong. But it is right.
 	mesh.use_auto_smooth = True
+
+	# Apply the UVs
+
+	for loop, uvs in zip(mesh.uv_layers.new().data, loop_uvs):
+		loop.uv = uvs
 
 	# Validate the mesh and make sure it doesn't have any invalid indices.
 	mesh.validate()
