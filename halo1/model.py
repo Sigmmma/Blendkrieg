@@ -75,7 +75,7 @@ def import_halo1_nodes_from_jms(jms, *,
 	'''
 	view_layer = bpy.context.view_layer
 
-	scene_nodes = dict()
+	scene_nodes = {}
 
 	absolute_transforms = get_absolute_node_transforms_from_jms(jms.nodes)
 
@@ -145,22 +145,22 @@ def import_halo1_nodes_from_jms(jms, *,
 		if (len(children) == 1 # Can't connect to multiple children, so don't.
 		and bone.name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)
 		and children[0].name[len(NODE_NAME_PREFIX): ].startswith(attach_bones)):
-			child_head = children[0].head
+			child = children[0]
 
 			distance = point_distance_to_line(
-				child_head,
+				child.head,
 				(bone.head, directions[bone.name]),
 				use_double_rounding=False)
 
 			if distance < max_attachment_distance:
 				print("Connecting %r to %r with distance %.12f" %
-						(children[0].name, bone.name, distance))
+						(child.name, bone.name, distance))
 				# If the child bone's head is on a line with the parent's tail
 				# direction we can set the parent tail to the location of the
 				# child head.
-				bone.tail = child_head
+				bone.tail = child.head
 				# Connect the bone so it stays attached when editing.
-				children[0].use_connect = True
+				child.use_connect = True
 
 	# Change back to object mode so the rest of the script can execute properly.
 
@@ -169,7 +169,7 @@ def import_halo1_nodes_from_jms(jms, *,
 	return armature_obj, scene_nodes
 
 def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.01,
-		scene_nodes=dict(), import_radius=False,
+		scene_nodes={}, import_radius=False,
 		permutation_filter=(), region_filter=()
 		):
 	'''
@@ -221,11 +221,17 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 			scene_marker.parent_type = 'BONE'
 			scene_marker.parent_bone = parent.name
 
-			# Ajust location for difference in forward axis between Halo
-			# and Blender bones.
+			# The rotation is offset by 0, 0, -90 euler, so we rotate it to
+			# fix that.
+
 			scene_marker.location.rotate(Euler((0.0, 0.0, math.radians(90.0))))
-			# Adjust location for being parented to the tail end of the bone
-			# rather than the head end.
+
+			# Then we subtract the length of the parent bone from the y axis,
+			# the y axis being the axis that is offset.
+
+			# Halo bone behavior expects markers their 0 0 0 to be at the bone
+			# base. But when attaching in Blender its 0 0 0 is instead at the
+			# bone's tail end.
 			scene_marker.location.y -= parent.length
 
 

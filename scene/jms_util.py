@@ -25,6 +25,9 @@ def get_absolute_node_transforms_from_jms(node_list):
 	'''
 	Takes a JmsNodes list and returns the absolute transformations in a dict.
 	'''
+	# This could be a list. But we keep it a dict to keep the implementation
+	# style synced across different modules. It also allows us to leverage
+	# dictionary functions.
 	node_transforms = {}
 
 	for i, node in enumerate(node_list):
