@@ -68,8 +68,8 @@ def import_halo1_nodes_from_jms(jms, *,
 	max_attachment_distance is the max distance a bone may deviate from
 	the line that signifies the direction of the parent.
 
-	attach_bones is a tuple of prefixes that this function should attempt to
-	connect.
+	attach_bones is a tuple of name prefixes that this function should attempt
+	to connect.
 
 	Returns the armature object and a dict of index - bone pairs.
 	'''
@@ -232,9 +232,10 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 			# Then we subtract the length of the parent bone from the y axis,
 			# the y axis being the axis that is offset.
 
-			# Halo bone behavior expects markers their 0 0 0 to be at the bone
-			# base. But when attaching in Blender its 0 0 0 is instead at the
-			# bone's tail end.
+			# In Halo, marker positions are relative to the start of their
+			# parent bone. In blender they are relative to the end of the bone.
+			# So, we subtract the length of the bone from the y axis to
+	        # make the final positions match up.
 			scene_marker.location.y -= parent.length
 
 	#TODO: Should this return something?
