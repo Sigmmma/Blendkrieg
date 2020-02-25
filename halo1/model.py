@@ -292,7 +292,7 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 	))
 
 	# Remove unused vertices
-	vertices, triangles = reduce_vertices(vertices, triangles)
+	vertices, triangles, translation_dict = reduce_vertices(vertices, triangles)
 
 	# Chain all of the triangle normals together into loop normals.
 	# ((x, y, z), (x, y, z), (x, y, z)), ((x, y, z), (x, y, z), (x, y, z)),
@@ -334,10 +334,36 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 	scene = bpy.context.collection
 	scene.objects.link(region_obj)
 
+	# If the function was supplied with an armature object attempt to skin to it.
+
 	region_obj.parent = armature_obj
+
 	if region_obj.parent.type == 'ARMATURE':
 		mod = region_obj.modifiers.new('armature', 'ARMATURE')
 		mod.object = armature_obj
+
+		# Create a vertex group for each bone.
+
+		for node in jms.nodes:
+			region_obj.vertex_groups.new(name=NODE_NAME_PREFIX+node.name)
+
+		vertex_groups = region_obj.vertex_groups
+
+		# Add the vertices to all the correct vertex groups.
+
+		for jms_i in translation_dict:
+			v = jms.verts[jms_i]
+			mesh_i = translation_dict[jms_i]
+
+			if v.node_0 != -1:
+				# The first node has no skinning data in JMS files (oof)
+				if v.node_1 != -1:
+					vertex_groups[v.node_0].add([mesh_i], 1.0 - v.node_1_weight, 'ADD')
+				else:
+					vertex_groups[v.node_0].add([mesh_i], 1.0, 'ADD')
+
+			if v.node_1 != -1:
+				vertex_groups[v.node_1].add([mesh_i], v.node_1_weight, 'ADD')
 
 	return region_obj
 
