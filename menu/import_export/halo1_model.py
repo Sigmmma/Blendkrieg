@@ -104,7 +104,7 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		import_halo1_markers_from_jms(jms, scale=scale,
 			node_size=self.marker_size, armature=armature, scene_nodes=nodes)
 
-		import_halo1_all_regions_from_jms(jms, name=name, scale=scale)
+		import_halo1_all_regions_from_jms(jms, name=name, scale=scale, armature_obj=armature)
 
 		return {'FINISHED'}
 
