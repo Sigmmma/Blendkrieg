@@ -240,9 +240,19 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 
 	#TODO: Should this return something?
 
-def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filter=(), armature_obj=None):
+def import_halo1_region_from_jms(jms, *,
+		name="unnamed",
+		scale=1.0,
+		region_filter=(),
+		armature_obj=None,
+		skin_vertices=True):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
+
+	Only imports the regions in the region filter.
+
+	mesh object gets linked to armature_obj and skinned to the bones if
+	skin_vertices is True.
 	'''
 
 	if not region_filter:
@@ -338,7 +348,7 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 
 	region_obj.parent = armature_obj
 
-	if region_obj.parent.type == 'ARMATURE':
+	if skin_vertices and region_obj.parent.type == 'ARMATURE':
 		mod = region_obj.modifiers.new('armature', 'ARMATURE')
 		mod.object = armature_obj
 
