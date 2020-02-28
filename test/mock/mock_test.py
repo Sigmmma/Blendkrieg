@@ -1,5 +1,7 @@
 from pocha import *
 from hamcrest import *
+
+from math import radians
 from mathutils import Euler, Quaternion, Vector
 
 import bpy
@@ -492,4 +494,44 @@ def blenderMockTests():
 			'Material diffuse color set')
 
 		assert_that(mat.name, equal_to('Pyramid'), 'Material name set')
+
+	@it('Setting transforms for mesh')
+	def meshTransforms():
+		bpy.set_scene_data({
+			'obj1': {
+				'mesh': 'pyramid.dae'
+			},
+			'obj2': {
+				'mesh': 'pyramid.dae',
+				'location': (1, 2, 1),
+				'rotation': Euler((0, radians(45), 0)),
+				'scale': (3, 1, 1)
+			}
+		})
+
+		obj1 = bpy.data.objects.get('obj1')
+		obj2 = bpy.data.objects.get('obj2')
+
+		assert_that(obj1.location, equal_to(Vector()), 'obj1 location is default')
+		assert_that(obj1.rotation_euler, equal_to(Euler()), 'obj1 rotation is default')
+		assert_that(obj1.scale, equal_to(Vector()), 'obj1 scale is default')
+
+		assert_that(obj2.location, equal_to(Vector((1, 2, 1))), 'obj2 location set')
+		assert_that(obj2.rotation_euler,
+			equal_to(Euler((0, radians(45), 0))),
+			'obj2 rotation is set')
+		assert_that(obj2.scale, equal_to(Vector((3, 1, 1))), 'obj2 scale set')
+
+		mesh1 = obj1.to_mesh()
+		mesh2 = obj2.to_mesh()
+
+		assert_that(mesh1,
+			not_(equal_to(mesh2)),
+			'obj1 and obj2 have different mesh objects')
+
+		# Mesh transforms should be separate from the mesh itself.
+		# In other words, these meshes should be identical.
+		# TODO potentially use custom mesh_equals matcher here?
+		for idx, (v1, v2) in enumerate(zip(mesh1.vertices, mesh2.vertices)):
+			assert_that(v1.co, equal_to(v2.co), 'Vertex %d matches' % idx)
 
