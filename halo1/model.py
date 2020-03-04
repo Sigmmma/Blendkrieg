@@ -357,8 +357,6 @@ def import_halo1_region_from_jms(jms, *,
 		for node in jms.nodes:
 			region_obj.vertex_groups.new(name=NODE_NAME_PREFIX+node.name)
 
-		vertex_groups = region_obj.vertex_groups
-
 		# Add the vertices to all the correct vertex groups.
 
 		for jms_i in translation_dict:
@@ -368,12 +366,15 @@ def import_halo1_region_from_jms(jms, *,
 			if v.node_0 != -1:
 				# The first node has no skinning data in JMS files (oof)
 				if v.node_1 != -1:
-					vertex_groups[v.node_0].add([mesh_i], 1.0 - v.node_1_weight, 'ADD')
+					region_obj.vertex_groups[v.node_0].add(
+						[mesh_i], 1.0 - v.node_1_weight, 'ADD')
 				else:
-					vertex_groups[v.node_0].add([mesh_i], 1.0, 'ADD')
+					region_obj.vertex_groups[v.node_0].add(
+						[mesh_i], 1.0, 'ADD')
 
 			if v.node_1 != -1:
-				vertex_groups[v.node_1].add([mesh_i], v.node_1_weight, 'ADD')
+				region_obj.vertex_groups[v.node_1].add(
+					[mesh_i], v.node_1_weight, 'ADD')
 
 	return region_obj
 
