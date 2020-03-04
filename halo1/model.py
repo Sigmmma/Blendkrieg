@@ -244,15 +244,15 @@ def import_halo1_region_from_jms(jms, *,
 		name="unnamed",
 		scale=1.0,
 		region_filter=(),
-		armature_obj=None,
+		parent_rig=None,
 		skin_vertices=True):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
 
 	Only imports the regions in the region filter.
 
-	mesh object gets linked to armature_obj and skinned to the bones if
-	skin_vertices is True.
+	mesh object gets linked to parent_rig and skinned to the bones if
+	skin_vertices is True and the parent is an ARMATURE object.
 	'''
 
 	if not region_filter:
@@ -344,13 +344,14 @@ def import_halo1_region_from_jms(jms, *,
 	scene = bpy.context.collection
 	scene.objects.link(region_obj)
 
-	# If the function was supplied with an armature object attempt to skin to it.
+	# If the function was supplied with a parent object attempt to skin to it
+	# if it is an ARMATURE.
 
-	region_obj.parent = armature_obj
+	region_obj.parent = parent_rig
 
 	if skin_vertices and region_obj.parent.type == 'ARMATURE':
 		mod = region_obj.modifiers.new('armature', 'ARMATURE')
-		mod.object = armature_obj
+		mod.object = parent_rig
 
 		# Create a vertex group for each bone.
 
@@ -378,7 +379,7 @@ def import_halo1_region_from_jms(jms, *,
 
 	return region_obj
 
-def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0, armature_obj=None):
+def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0, parent_rig=None):
 	'''
 	Import all regions from a given jms.
 	'''
@@ -388,5 +389,5 @@ def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0, armature_obj=N
 			name=name+":"+jms.regions[i],
 			scale=scale,
 			region_filter=(i,),
-			armature_obj=armature_obj
+			parent_rig=parent_rig
 		)
