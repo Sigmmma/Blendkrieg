@@ -209,6 +209,9 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 			name=MARKER_NAME_PREFIX+marker.name,
 			size=(scale if import_radius else node_size))
 
+		# Make the marker invisible in renders.
+		scene_marker.hide_render = True
+
 		# Set scale to be the size for easy changing of the marker size.
 		if import_radius:
 			set_uniform_scale(scene_marker, marker.radius)
