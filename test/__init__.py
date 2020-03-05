@@ -18,6 +18,7 @@ from os import path
 
 # Adds the directory that contains Blendkrieg to path so it can be imported
 # using import Blendkrieg.
-sys.path.insert(0, path.dirname(path.dirname(__file__)))
+#                  Git         /Blendkrieg  /test        /__init__.py
+sys.path.insert(0, path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))
 
 del sys, path
