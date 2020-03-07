@@ -243,9 +243,19 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 
 	#TODO: Should this return something?
 
-def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filter=()):
+def import_halo1_region_from_jms(jms, *,
+		name="unnamed",
+		scale=1.0,
+		region_filter=(),
+		parent_rig=None,
+		skin_vertices=True):
 	'''
 	Imports all the geometry into a Halo 1 JMS into the scene.
+
+	Only imports the regions in the region filter.
+
+	mesh object gets linked to parent_rig and skinned to the bones if
+	skin_vertices is True and the parent is an ARMATURE object.
 	'''
 
 	if not region_filter:
@@ -295,7 +305,7 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 	))
 
 	# Remove unused vertices
-	vertices, triangles = reduce_vertices(vertices, triangles)
+	vertices, triangles, translation_dict = reduce_vertices(vertices, triangles)
 
 	# Chain all of the triangle normals together into loop normals.
 	# ((x, y, z), (x, y, z), (x, y, z)), ((x, y, z), (x, y, z), (x, y, z)),
@@ -337,9 +347,42 @@ def import_halo1_region_from_jms(jms, *, name="unnamed", scale=1.0, region_filte
 	scene = bpy.context.collection
 	scene.objects.link(region_obj)
 
+	# If the function was supplied with a parent object attempt to skin to it
+	# if it is an ARMATURE.
+
+	region_obj.parent = parent_rig
+
+	if skin_vertices and region_obj.parent.type == 'ARMATURE':
+		mod = region_obj.modifiers.new('armature', 'ARMATURE')
+		mod.object = parent_rig
+
+		# Create a vertex group for each bone.
+
+		for node in jms.nodes:
+			region_obj.vertex_groups.new(name=NODE_NAME_PREFIX+node.name)
+
+		# Add the vertices to all the correct vertex groups.
+
+		for jms_i in translation_dict:
+			v = jms.verts[jms_i]
+			mesh_i = translation_dict[jms_i]
+
+			if v.node_0 != -1:
+				# The first node has no skinning data in JMS files (oof)
+				if v.node_1 != -1:
+					region_obj.vertex_groups[v.node_0].add(
+						[mesh_i], 1.0 - v.node_1_weight, 'ADD')
+				else:
+					region_obj.vertex_groups[v.node_0].add(
+						[mesh_i], 1.0, 'ADD')
+
+			if v.node_1 != -1:
+				region_obj.vertex_groups[v.node_1].add(
+					[mesh_i], v.node_1_weight, 'ADD')
+
 	return region_obj
 
-def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0):
+def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0, parent_rig=None):
 	'''
 	Import all regions from a given jms.
 	'''
@@ -348,5 +391,6 @@ def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0):
 			jms,
 			name=name+":"+jms.regions[i],
 			scale=scale,
-			region_filter=(i,)
+			region_filter=(i,),
+			parent_rig=parent_rig
 		)

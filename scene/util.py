@@ -98,7 +98,7 @@ def reduce_vertices(verts, tris):
 	)
 
 	# Return as tuples because they are nice and fast.
-	return tuple(new_verts), tuple(new_tris)
+	return tuple(new_verts), tuple(new_tris), translation_dict
 
 def trace_into_direction(direction, distance=10000.0):
 	'''
