@@ -34,7 +34,18 @@ if __name__ == '__main__':
 	if blender is None:
 		raise Exception('Cannot find Blender executable')
 
-	run_pocha = Path(__file__).resolve().parent.joinpath('run-pocha.py')
+	# Build a path to our test running script that Blender will run
+	cur_dir = Path(__file__).resolve().parent
+	run_pocha = cur_dir.joinpath('run-pocha.py')
 
-	subprocess.run([blender, '--background', '--python', str(run_pocha)],
-		cwd=str(run_pocha.parent.parent))
+	# Peel back directories until we find the project root
+	while not cur_dir.samefile(cur_dir.root)   \
+	  and not cur_dir.joinpath('.git').exists():
+		cur_dir = cur_dir.parent
+
+	# Run Blender with the project root as the working directory so this script
+	# will work when run from anywhere.
+	subprocess.run(
+		[blender, '--background', '--python', str(run_pocha)],
+		cwd=str(cur_dir)
+	)
