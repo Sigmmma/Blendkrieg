@@ -36,4 +36,5 @@ if __name__ == '__main__':
 
 	run_pocha = Path(__file__).resolve().parent.joinpath('run-pocha.py')
 
-	subprocess.run([blender, '--background', '--python', str(run_pocha)])
+	subprocess.run([blender, '--background', '--python', str(run_pocha)],
+		cwd=str(run_pocha.parent.parent))
