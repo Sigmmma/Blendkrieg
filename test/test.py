@@ -24,12 +24,9 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	# Support reading Blender location in multiple ways
-	if args.blender:
-		blender = args.blender
-	elif os.environ.get('BLENDER_PATH'):
-		blender = os.environ.get('BLENDER_PATH')
-	else:
-		blender = which('blender')
+	blender = args.blender                \
+		or os.environ.get('BLENDER_PATH') \
+		or which('blender')
 
 	if blender is None:
 		raise Exception('Cannot find Blender executable')
