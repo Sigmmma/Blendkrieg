@@ -33,6 +33,7 @@ class Object:
 		self.rotation_mode = 'XYZ'     # Rotation mode (or Euler coordinate order)
 		self.rotation_quaternion = Quaternion() # Rotation in Quaternion coordinates
 		self.scale = Vector()          # Scale of this object
+		self.type = None  # TODO do we need this?
 		self.users_collection = set()  # All the collections this object belongs to
 		self._mesh = None # The mesh associated with this object
 
@@ -43,12 +44,15 @@ class Mesh:
 	def __init__(self):
 		# NOTE: Blender does not track a "triangles" field. Triangles can be
 		# derived from polygons and vertices.
+		self.edges = list()     # All edges in this mesh
 		self.materials = dict() # All materials applied to this mesh
 		self.name = None        # Name as it appears in Outliner
+		self.polygons = list()  # All polygons in this mesh
 		self.uv_layers = dict() # This mesh's UVW map. NOTE: Blender can have
 		                        # several of these, but we only support one.
 		self.vertices = list()  # All vertices in this mesh
 
+# FIXME MeshVertex (change name?)
 class Vertex:
 	def __init__(self):
 		self.co = Vector()     # The XYZ position of this vertex
@@ -62,6 +66,16 @@ class MeshUVLoopLayer:
 class MeshUVLoop:
 	def __init__(self):
 		self.uv = Vector() # The UV coordinate for this UV Loop
+
+class Edge:
+	def __init__(self):
+		self.use_sharp_edge = False
+		self.vertices = list()
+
+class Polygon:
+	def __init__(self):
+		self.normal = Vector()
+		self.vertices = list()
 
 class Material:
 	def __init__(self):
@@ -160,6 +174,10 @@ def _load_mesh(testdata):
 		meshname = testdata.get('meshname', _unique_name(geom.name))
 		mesh.name = meshname
 
+		# Collada separates the faces for each material into their own
+		# primatives. Pycollada duplicates vertices shared by each primative, so
+		# we need to create a map of vertex indices to vertex values to find the
+		# duplicates.
 		prim = geom.primitives[0]
 
 		# Collada vertex position order matches Blender
@@ -224,4 +242,3 @@ def _unique_name(name):
 	except KeyError:
 		_name_cache[name] = 1
 	return new_name
-

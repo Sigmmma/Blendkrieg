@@ -446,7 +446,7 @@ def blenderMockTests():
 		assert_that(vs[3].normal, equal_to(Vector(( x,  x, -y))), 'Normal 3')
 		assert_that(vs[4].normal, equal_to(Vector(( 0,  0,  1))), 'Normal 4')
 
-	@it('Loading texture mapping from mesh file')
+	@it('Loading UVs from mesh file')
 	def meshTextureMapping():
 		bpy.set_scene_data({
 			'obj': { 'mesh': 'pyramid.dae' }
@@ -494,6 +494,11 @@ def blenderMockTests():
 			'Material diffuse color set')
 
 		assert_that(mat.name, equal_to('Pyramid'), 'Material name set')
+
+	@it('Loading material assignments from mesh file')
+	def meshFaceMaterials():
+		pass
+		# Test that faces have the right material assigned
 
 	@it('Setting transforms for mesh')
 	def meshTransforms():
