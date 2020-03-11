@@ -178,6 +178,7 @@ def _load_mesh(testdata):
 		# primatives. Pycollada duplicates vertices shared by each primative, so
 		# we need to create a map of vertex indices to vertex values to find the
 		# duplicates.
+		vertex_map = {}
 		prim = geom.primitives[0]
 
 		# Collada vertex position order matches Blender
