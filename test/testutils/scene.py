@@ -59,7 +59,9 @@ def read_in_obj(data, parent=None, parent_colls=[]):
 		raise Exception('Invalid rotation type: ' + str(type(rot)))
 
 	# Associate the object with the appropriate collections
-	obj_colls = add_new_collections(data.get('collections', []))
+	obj_colls = add_new_collections(
+		data.get('collections', []),
+		parent_colls=parent_colls)
 	obj_colls.extend(parent_colls)
 	obj_colls = list(set(obj_colls))
 	if obj_colls:
