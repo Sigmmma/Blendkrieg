@@ -1,31 +1,31 @@
 from pocha import *
 from hamcrest import *
 
+import bpy
 from math import radians
 from mathutils import Euler, Quaternion, Vector
 
-import bpy
-# Put this assert outside of the Pocha stuff so we exception out before we even
-# try to run tests, unless we're using the mocks.
-assert_that(bpy.is_mock, equal_to(True))
+from test import testutils
 
 # NOTE The values used in these test assertions were manually retrieved from
 # Blender's interactive Python console using the provided pyramid.blend file.
-# This is so we know we're accurately replicating Blender's functionality.
-@describe('Blender mock tests')
+@describe('Test scene setup')
 def blenderMockTests():
 
 	@beforeEach
 	def verifyEmpty():
-		bpy.clear_mock()
+		testutils.clear_scene()
 		assert_that(bpy.data.collections, empty())
 		assert_that(bpy.data.materials, empty())
 		assert_that(bpy.data.meshes, empty())
 		assert_that(bpy.data.objects, empty())
 
+	# TODO error checking for bad test scene
+	# TODO ensure things are actually linked to the scene
+
 	@it('Setting and retrieving single object')
 	def singleObjectSet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'MyObject': {}
 		})
 
@@ -35,7 +35,7 @@ def blenderMockTests():
 
 	@it('Setting an object with children')
 	def objectWithChildrenSet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'Parent': {
 				'children': {
 					'child1': {},
@@ -61,7 +61,7 @@ def blenderMockTests():
 
 	@it('Collections created and populated by name')
 	def collectionsCreatedByName():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {
 				'collections': ['coll1']
 			},
@@ -87,7 +87,7 @@ def blenderMockTests():
 
 	@it('All children added to parent\'s collection')
 	def childrenAddedToParentsCollection():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'Parent': {
 				'collections': ['coll'],
 				'children': {
@@ -113,7 +113,7 @@ def blenderMockTests():
 
 	@it('Collections can have nested sub-collections')
 	def nestedCollections():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'Parent': {
 				'collections': ['coll1'],
 				'children': {
@@ -182,7 +182,7 @@ def blenderMockTests():
 
 	@it('Getting object location')
 	def objectLocationGet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {
 				'location': (1, 2, 3)
@@ -206,7 +206,7 @@ def blenderMockTests():
 
 	@it('Setting object location')
 	def objectLocationSet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {}
 		})
@@ -229,7 +229,7 @@ def blenderMockTests():
 
 	@it('Getting object rotation (euler)')
 	def objectRotationEulerGet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {
 				'rotation': Euler((1, 2, 3))
@@ -255,7 +255,7 @@ def blenderMockTests():
 
 	@it('Setting object rotation (euler)')
 	def objectRotationEulerSet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {}
 		})
@@ -276,14 +276,9 @@ def blenderMockTests():
 			equal_to(Euler((1, 2, 3))),
 			'Object rotation set by components')
 
-	# TODO the standalone mathutils we're using (v2.81.2) doesn't support
-	# setting the coordinate order for Euler rotation. When that support is
-	# added, we'll want to add another test here for changing rotation mode to
-	# 'ZYX' and making sure the coordinates are re-ordered.
-
 	@it('Getting object rotation (quaternion')
 	def objectRotationQuaternionGet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {
 				'rotation': Quaternion((1, 2, 3, 4))
@@ -314,7 +309,7 @@ def blenderMockTests():
 
 	@it('Setting object rotation (quaternion)')
 	def objectRotationQuaterionSet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {}
 		})
@@ -338,7 +333,7 @@ def blenderMockTests():
 
 	@it('Getting object scale')
 	def objectScaleGet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {
 				'scale': (1, 2, 3)
@@ -358,7 +353,7 @@ def blenderMockTests():
 
 	@it('Setting object scale')
 	def objectScaleSet():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {},
 			'obj2': {}
 		})
@@ -381,7 +376,7 @@ def blenderMockTests():
 
 	@it('Loading mesh from mesh file')
 	def meshFromObj():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj': {
 				'mesh': 'pyramid.dae',
 				'meshname': 'testmesh'
@@ -396,7 +391,7 @@ def blenderMockTests():
 
 	@it('Mesh names have unique defaults')
 	def meshUniqueDefaultNames():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': { 'mesh': 'pyramid.dae' },
 			'obj2': { 'mesh': 'pyramid.dae' },
 			'obj3': { 'mesh': 'pyramid.dae' }
@@ -412,7 +407,7 @@ def blenderMockTests():
 
 	@it('Loading vertices from mesh file')
 	def meshVertices():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj': { 'mesh': 'pyramid.dae' }
 		})
 
@@ -429,7 +424,7 @@ def blenderMockTests():
 
 	@it('Loading vertex normals from mesh file')
 	def meshSmoothingGroups():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj': { 'mesh': 'pyramid.dae' }
 		})
 
@@ -448,7 +443,7 @@ def blenderMockTests():
 
 	@it('Loading UVs from mesh file')
 	def meshTextureMapping():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj': { 'mesh': 'pyramid.dae' }
 		})
 
@@ -478,7 +473,7 @@ def blenderMockTests():
 
 	@it('Loading materials from mesh file')
 	def meshMaterials():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj': { 'mesh': 'pyramid.dae' }
 		})
 
@@ -502,7 +497,7 @@ def blenderMockTests():
 
 	@it('Setting transforms for mesh')
 	def meshTransforms():
-		bpy.set_scene_data({
+		testutils.set_scene_data({
 			'obj1': {
 				'mesh': 'pyramid.dae'
 			},
