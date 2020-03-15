@@ -28,7 +28,7 @@ def process_obj_table(table, parent=None, parent_colls=[]):
 	'''
 	for name, data in table.items():
 		data['name'] = name
-		read_in_obj(data, parent_colls=parent_colls)
+		read_in_obj(data, parent=parent, parent_colls=parent_colls)
 
 
 def read_in_obj(data, parent=None, parent_colls=[]):
