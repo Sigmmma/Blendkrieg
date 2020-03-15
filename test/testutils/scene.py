@@ -91,12 +91,16 @@ def add_new_collections(new_coll_names, parent_colls=[]):
 
 		if parent_colls:
 			for parent in parent_colls:
-				parent.children.link(coll)
+				maybe_link(parent.children, coll)
 		else:
-			bpy.context.scene.collection.children.link(coll)
+			maybe_link(bpy.context.scene.collection.children, coll)
 
 	return new_colls
 
+def maybe_link(parent, obj):
+	'''Link the obj to the parent if it isn't already linked'''
+	if not parent.get(obj.name):
+		parent.link(obj)
 
 # TODO remove this stuff. It's just here for reference.
 #me = bpy.data.meshes.new('blah')
