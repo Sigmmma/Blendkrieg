@@ -344,7 +344,7 @@ def blenderMockTests():
 		obj2 = bpy.data.objects.get('obj2')
 
 		assert_that(obj1.scale,
-			equal_to(Vector()),
+			equal_to(Vector((1, 1, 1))),
 			'Object scale defaults to (1, 1, 1)')
 
 		assert_that(obj2.scale.x, equal_to(1), 'X component addressable')
@@ -514,7 +514,7 @@ def blenderMockTests():
 
 		assert_that(obj1.location, equal_to(Vector()), 'obj1 location is default')
 		assert_that(obj1.rotation_euler, equal_to(Euler()), 'obj1 rotation is default')
-		assert_that(obj1.scale, equal_to(Vector()), 'obj1 scale is default')
+		assert_that(obj1.scale, equal_to(Vector((1, 1, 1))), 'obj1 scale is default')
 
 		assert_that(obj2.location, equal_to(Vector((1, 2, 1))), 'obj2 location set')
 		assert_that(obj2.rotation_euler,
