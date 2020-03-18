@@ -4,6 +4,9 @@ from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.library.number.iscloseto import isnumeric
 from mathutils import Vector # From Blender's API
 
+# Blender Vectors seem to only care about precision out to 8 digits
+DEFAULT_VECTOR_DELTA = 1e-8
+
 class VectorCloseTo(BaseMatcher):
 	'''Lets us match Blender Vectors without caring about full precision.'''
 
@@ -53,5 +56,5 @@ class VectorCloseTo(BaseMatcher):
 					.append_text('>\n')
 
 
-def vector_close_to(vector, delta):
+def vector_close_to(vector, delta=DEFAULT_VECTOR_DELTA):
 	return VectorCloseTo(vector, delta)
