@@ -440,15 +440,15 @@ def blenderMockTests():
 
 		assert_that(vs, has_length(5), 'Read in expected number of vertices')
 
-		x = 0.6890774  # Unpack these values to shorten assertions
-		y = 0.2241890
+		x = 0.68907743 # Unpack these values to shorten assertions
+		y = 0.22418896
 		z = 0.9999695
 		delt = 1e-7
-		assert_that(vs[0].normal, vector_close_to(Vector((-x, -x, -y)), delt), 'Normal 0')
-		assert_that(vs[1].normal, vector_close_to(Vector(( x, -x, -y)), delt), 'Normal 1')
-		assert_that(vs[2].normal, vector_close_to(Vector((-x,  x, -y)), delt), 'Normal 2')
-		assert_that(vs[3].normal, vector_close_to(Vector(( x,  x, -y)), delt), 'Normal 3')
-		assert_that(vs[4].normal, vector_close_to(Vector(( 0,  0,  z)), delt), 'Normal 4')
+		assert_that(vs[0].normal, equal_to(Vector((-x, -x, -y))), 'Normal 0')
+		assert_that(vs[1].normal, equal_to(Vector(( x, -x, -y))), 'Normal 1')
+		assert_that(vs[2].normal, equal_to(Vector((-x,  x, -y))), 'Normal 2')
+		assert_that(vs[3].normal, equal_to(Vector(( x,  x, -y))), 'Normal 3')
+		assert_that(vs[4].normal, equal_to(Vector(( 0,  0,  z))), 'Normal 4')
 
 	@it('Loading UVs from mesh file')
 	def meshTextureMapping():
