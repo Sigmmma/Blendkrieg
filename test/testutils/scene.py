@@ -40,9 +40,11 @@ def read_in_obj(data, parent=None, parent_colls=[]):
 	parent_colls - Blender collections to add the new object to. If empty, the
 	               new object will be linked to the scene's collection.
 	'''
-	# TODO mesh here
+	mesh = None
+	if data.get('mesh'):
+		mesh = read_in_mesh(data['mesh'], name_override=data.get('meshname'))
 	# TODO detect case where two meshes explicitly specify the same name
-	obj = bpy.data.objects.new(data.get('name'), None)
+	obj = bpy.data.objects.new(data.get('name'), mesh)
 
 	obj.location = Vector(data.get('location', (0, 0, 0)))
 	obj.scale    = Vector(data.get('scale', (1, 1, 1)))
@@ -99,10 +101,33 @@ def add_new_collections(new_coll_names, parent_colls=[]):
 
 	return new_colls
 
+
 def maybe_link(parent, obj):
 	'''Link the obj to the parent if it isn't already linked'''
 	if not parent.get(obj.name):
 		parent.link(obj)
+
+
+def read_in_mesh(path, name_override=None):
+	# We need to do a diff of object names before and after import to find the
+	# name of the object we just imported. It's dumb but it works.
+	before_objs   = bpy.data.objects.keys()
+	before_meshes = bpy.data.meshes.keys()
+
+	bpy.ops.wm.collada_import(filepath=path)
+
+	obj_name  = list(set(bpy.data.objects.keys()).difference(before_objs))[0]
+	mesh_name = list(set(bpy.data.meshes.keys()).difference(before_meshes))[0]
+
+	# We only care about the mesh, so delete its containing object
+	obj = bpy.data.objects.get(obj_name)
+	bpy.data.objects.remove(obj, do_unlink=True)
+	mesh = bpy.data.meshes.get(mesh_name)
+
+	if name_override:
+		mesh.name = name_override
+
+	return mesh
 
 # TODO remove this stuff. It's just here for reference.
 #me = bpy.data.meshes.new('blah')

@@ -5,10 +5,17 @@ import bpy
 from math import radians
 from mathutils import Euler, Quaternion, Vector
 
-from test import testutils
+import testutils
+from testutils.hamcrest_matchers import vector_close_to
 
 # NOTE The values used in these test assertions were manually retrieved from
 # Blender's interactive Python console using the provided pyramid.blend file.
+#
+# They MAY POSSIBLY not line up exactly with what appears in Collada files.
+# Collada does some weird rounding stuff on export, but Blender somehow manages
+# to import those values with exactly the proper precision again.
+#
+# When in doubt, use the values from Blender's console.
 @describe('Test scene setup')
 def blenderMockTests():
 
@@ -378,7 +385,7 @@ def blenderMockTests():
 	def meshFromObj():
 		testutils.set_scene_data({
 			'obj': {
-				'mesh': 'pyramid.dae',
+				'mesh': 'test/testutils/pyramid.dae',
 				'meshname': 'testmesh'
 			}
 		})
@@ -392,9 +399,9 @@ def blenderMockTests():
 	@it('Mesh names have unique defaults')
 	def meshUniqueDefaultNames():
 		testutils.set_scene_data({
-			'obj1': { 'mesh': 'pyramid.dae' },
-			'obj2': { 'mesh': 'pyramid.dae' },
-			'obj3': { 'mesh': 'pyramid.dae' }
+			'obj1': { 'mesh': 'test/testutils/pyramid.dae' },
+			'obj2': { 'mesh': 'test/testutils/pyramid.dae' },
+			'obj3': { 'mesh': 'test/testutils/pyramid.dae' }
 		})
 
 		obj1 = bpy.data.objects.get('obj1')
@@ -408,7 +415,7 @@ def blenderMockTests():
 	@it('Loading vertices from mesh file')
 	def meshVertices():
 		testutils.set_scene_data({
-			'obj': { 'mesh': 'pyramid.dae' }
+			'obj': { 'mesh': 'test/testutils/pyramid.dae' }
 		})
 
 		mesh = bpy.data.objects.get('obj').to_mesh()
@@ -425,7 +432,7 @@ def blenderMockTests():
 	@it('Loading vertex normals from mesh file')
 	def meshSmoothingGroups():
 		testutils.set_scene_data({
-			'obj': { 'mesh': 'pyramid.dae' }
+			'obj': { 'mesh': 'test/testutils/pyramid.dae' }
 		})
 
 		mesh = bpy.data.objects.get('obj').to_mesh()
@@ -433,18 +440,20 @@ def blenderMockTests():
 
 		assert_that(vs, has_length(5), 'Read in expected number of vertices')
 
-		x = 0.6891064  # Unpack these values to shorten assertions
-		y = 0.2241984
-		assert_that(vs[0].normal, equal_to(Vector((-x, -x, -y))), 'Normal 0')
-		assert_that(vs[1].normal, equal_to(Vector(( x, -x, -y))), 'Normal 1')
-		assert_that(vs[2].normal, equal_to(Vector((-x,  x, -y))), 'Normal 2')
-		assert_that(vs[3].normal, equal_to(Vector(( x,  x, -y))), 'Normal 3')
-		assert_that(vs[4].normal, equal_to(Vector(( 0,  0,  1))), 'Normal 4')
+		x = 0.6890774  # Unpack these values to shorten assertions
+		y = 0.2241890
+		z = 0.9999695
+		delt = 1e-7
+		assert_that(vs[0].normal, vector_close_to(Vector((-x, -x, -y)), delt), 'Normal 0')
+		assert_that(vs[1].normal, vector_close_to(Vector(( x, -x, -y)), delt), 'Normal 1')
+		assert_that(vs[2].normal, vector_close_to(Vector((-x,  x, -y)), delt), 'Normal 2')
+		assert_that(vs[3].normal, vector_close_to(Vector(( x,  x, -y)), delt), 'Normal 3')
+		assert_that(vs[4].normal, vector_close_to(Vector(( 0,  0,  z)), delt), 'Normal 4')
 
 	@it('Loading UVs from mesh file')
 	def meshTextureMapping():
 		testutils.set_scene_data({
-			'obj': { 'mesh': 'pyramid.dae' }
+			'obj': { 'mesh': 'test/testutils/pyramid.dae' }
 		})
 
 		mesh = bpy.data.objects.get('obj').to_mesh()
@@ -474,7 +483,7 @@ def blenderMockTests():
 	@it('Loading materials from mesh file')
 	def meshMaterials():
 		testutils.set_scene_data({
-			'obj': { 'mesh': 'pyramid.dae' }
+			'obj': { 'mesh': 'test/testutils/pyramid.dae' }
 		})
 
 		mesh = bpy.data.meshes.get('Pyramid')
@@ -499,10 +508,10 @@ def blenderMockTests():
 	def meshTransforms():
 		testutils.set_scene_data({
 			'obj1': {
-				'mesh': 'pyramid.dae'
+				'mesh': 'test/testutils/pyramid.dae'
 			},
 			'obj2': {
-				'mesh': 'pyramid.dae',
+				'mesh': 'test/testutils/pyramid.dae',
 				'location': (1, 2, 1),
 				'rotation': Euler((0, radians(45), 0)),
 				'scale': (3, 1, 1)
