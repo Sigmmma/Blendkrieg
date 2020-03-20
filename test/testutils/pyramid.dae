@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.80.75</authoring_tool>
     </contributor>
-    <created>2020-02-17T06:36:57</created>
-    <modified>2020-02-17T06:36:57</modified>
+    <created>2020-03-19T21:18:54</created>
+    <modified>2020-03-19T21:18:54</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -28,11 +28,31 @@
         </technique>
       </profile_COMMON>
     </effect>
+    <effect id="Second-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <color sid="diffuse">0.007433082 0 1 1</color>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
   </library_effects>
   <library_images/>
   <library_materials>
     <material id="Pyramid-material" name="Pyramid">
       <instance_effect url="#Pyramid-effect"/>
+    </material>
+    <material id="Second-material" name="Second">
+      <instance_effect url="#Second-effect"/>
     </material>
   </library_materials>
   <library_geometries>
@@ -70,12 +90,18 @@
         <vertices id="Pyramid-mesh-vertices">
           <input semantic="POSITION" source="#Pyramid-mesh-positions"/>
         </vertices>
-        <polylist material="Pyramid-material" count="5">
+        <triangles material="Pyramid-material" count="4">
           <input semantic="VERTEX" source="#Pyramid-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Pyramid-mesh-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#Pyramid-mesh-map-0" offset="2" set="0"/>
-          <vcount>3 3 3 3 4 </vcount>
-          <p>4 0 0 3 1 1 2 2 2 4 0 3 2 2 4 0 3 5 1 4 6 4 0 7 0 3 8 1 4 9 3 1 10 4 0 11 0 3 12 2 2 13 3 1 14 1 4 15</p>
+          <p>4 0 0 3 1 1 2 2 2 4 0 3 2 2 4 0 3 5 1 4 6 4 0 7 0 3 8 1 4 9 3 1 10 4 0 11</p>
+        </triangles>
+        <polylist material="Second-material" count="1">
+          <input semantic="VERTEX" source="#Pyramid-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Pyramid-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Pyramid-mesh-map-0" offset="2" set="0"/>
+          <vcount>4 </vcount>
+          <p>0 3 12 2 2 13 3 1 14 1 4 15</p>
         </polylist>
       </mesh>
     </geometry>
@@ -88,6 +114,9 @@
           <bind_material>
             <technique_common>
               <instance_material symbol="Pyramid-material" target="#Pyramid-material">
+                <bind_vertex_input semantic="MyUV" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+              <instance_material symbol="Second-material" target="#Second-material">
                 <bind_vertex_input semantic="MyUV" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>

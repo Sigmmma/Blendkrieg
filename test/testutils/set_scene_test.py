@@ -409,8 +409,8 @@ def blenderMockTests():
 		obj3 = bpy.data.objects.get('obj3')
 
 		assert_that(obj1.to_mesh().name, equal_to('Pyramid'), 'Default name 1')
-		assert_that(obj2.to_mesh().name, equal_to('Pyramid.1'), 'Default name 2')
-		assert_that(obj3.to_mesh().name, equal_to('Pyramid.2'), 'Default name 3')
+		assert_that(obj2.to_mesh().name, equal_to('Pyramid.001'), 'Default name 2')
+		assert_that(obj3.to_mesh().name, equal_to('Pyramid.002'), 'Default name 3')
 
 	@it('Loading vertices from mesh file')
 	def meshVertices():
@@ -457,9 +457,9 @@ def blenderMockTests():
 
 		mesh = bpy.data.objects.get('obj').to_mesh()
 
-		assert_that(mesh.uv_layers, has_key('Test'), 'Mesh UV Layer set up')
+		assert_that(mesh.uv_layers, has_length(1), 'Mesh UV Layer set up')
 
-		uvs = mesh.uv_layers['Test'].data
+		uvs = mesh.uv_layers[0].data
 
 		assert_that(uvs, has_length(16), 'Read in expected number of UV Loops')
 		assert_that(uvs[ 0].uv, equal_to(Vector((0.5, 0.5))), 'UV  0')
@@ -493,7 +493,7 @@ def blenderMockTests():
 			'Mesh has material set')
 
 		assert_that(mat.diffuse_color,
-			equal_to((1, 0, 0, 1)),
+			contains(1, 0, 0, 1),
 			'Material diffuse color set')
 
 		assert_that(mat.name, equal_to('Pyramid'), 'Material name set')
