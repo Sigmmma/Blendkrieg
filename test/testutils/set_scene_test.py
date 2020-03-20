@@ -6,7 +6,7 @@ from math import radians
 from mathutils import Euler, Quaternion, Vector
 
 import testutils
-from testutils.hamcrest_matchers import vector_close_to
+from testutils.hamcrest_matchers import mesh_equal_to, vector_close_to
 
 # NOTE The values used in these test assertions were manually retrieved from
 # Blender's interactive Python console using the provided pyramid.blend file.
@@ -393,7 +393,7 @@ def blenderMockTests():
 		obj = bpy.data.objects.get('obj')
 		mesh = bpy.data.meshes.get('testmesh')
 
-		assert_that(obj.to_mesh(), equal_to(mesh), 'Mesh set on object')
+		assert_that(obj.to_mesh(), mesh_equal_to(mesh), 'Mesh set on object')
 		assert_that(mesh.name, equal_to('testmesh'), 'Mesh name is set')
 
 	@it('Mesh names have unique defaults')
@@ -533,13 +533,11 @@ def blenderMockTests():
 		mesh1 = obj1.to_mesh()
 		mesh2 = obj2.to_mesh()
 
-		assert_that(mesh1,
-			not_(equal_to(mesh2)),
-			'obj1 and obj2 have different mesh objects')
-
 		# Mesh transforms should be separate from the mesh itself.
 		# In other words, these meshes should be identical.
-		# TODO potentially use custom mesh_equals matcher here?
-		for idx, (v1, v2) in enumerate(zip(mesh1.vertices, mesh2.vertices)):
-			assert_that(v1.co, equal_to(v2.co), 'Vertex %d matches' % idx)
+		assert_that(mesh1, all_of(
+				not_(equal_to(mesh2)),
+				mesh_equal_to(mesh2)
+			),
+			'obj1 and obj2 have different mesh objects but same meshes')
 

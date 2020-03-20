@@ -1,5 +1,6 @@
 from math import fabs
 
+from bpy_types import Mesh
 from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.library.number.iscloseto import isnumeric
 from mathutils import Vector # From Blender's API
@@ -56,5 +57,46 @@ class VectorCloseTo(BaseMatcher):
 					.append_text('>\n')
 
 
+class MeshEquals(BaseMatcher):
+	'''Lets us match Blender meshes.
+
+	Currently this just matches the position and count of vertices.
+	This could fairly easily be extended to match other things too, like UVs.
+	'''
+	def __init__(self, mesh):
+		if not isinstance(mesh, Mesh):
+			raise TypeError('MeshEquals mesh must be a ' + str(Mesh))
+
+		self.mesh = mesh
+
+	def _matches(self, item):
+		if not isinstance(item, Mesh):
+			return False
+
+		if len(self.mesh.vertices) != len(item.vertices):
+			return False
+
+		# "co" compares vertex locations as Vectors
+		for v1, v2 in zip(self.mesh.vertices, item.vertices):
+			if v1.co != v2.co:
+				return False
+
+		return True
+
+	def describe_to(self, description):
+		description.append_text(self.mesh)
+
+	def describe_mismatch(self, item, description):
+		if not isinstance(item, Mesh):
+			super(MeshEquals, self).describe_mismatch(item, description)
+		else:
+			# TODO Diffing two meshes in text is too big a problem to solve for
+			# something this minor. If you're feeling really brave, go ahead.
+			description.append_text('Mesh vertices did not match up')
+
+
 def vector_close_to(vector, delta=DEFAULT_VECTOR_DELTA):
 	return VectorCloseTo(vector, delta)
+
+def mesh_equal_to(mesh):
+	return MeshEquals(mesh)
