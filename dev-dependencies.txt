@@ -1,4 +1,2 @@
 pocha
 pyhamcrest
-mathutils
-pycollada
