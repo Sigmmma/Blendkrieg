@@ -27,8 +27,6 @@ def blenderMockTests():
 		assert_that(bpy.data.meshes, empty())
 		assert_that(bpy.data.objects, empty())
 
-	# TODO ensure things are actually linked to the scene
-
 	@it('Unused fields are ignored')
 	def usedFieldsIgnored():
 		testutils.set_scene_data({
@@ -58,6 +56,10 @@ def blenderMockTests():
 		my_obj = bpy.data.objects.get('MyObject')
 		assert_that(my_obj, not_none(), 'Object is added')
 		assert_that(my_obj.name, equal_to('MyObject'), 'Object name is set')
+
+		assert_that(bpy.context.scene.collection.objects,
+			has_item(my_obj),
+			'Object added to scene')
 
 	@it('Setting an object with children')
 	def objectWithChildrenSet():
@@ -110,6 +112,14 @@ def blenderMockTests():
 
 		assert_that(obj1.users_collection, has_item(coll), 'obj1 has the collection')
 		assert_that(obj2.users_collection, has_item(coll), 'obj2 has the collection')
+
+		assert_that(bpy.context.scene.collection.objects,
+			not_(has_items(obj1, obj2)),
+			'Scene collection does not have objects of child collections')
+
+		assert_that(bpy.context.scene.objects,
+			has_items(obj1, obj2),
+			'Scene objects list DOES contain all nested child objects')
 
 	@it('All children added to parent\'s collection')
 	def childrenAddedToParentsCollection():
@@ -205,6 +215,12 @@ def blenderMockTests():
 				has_items(coll1, coll3, coll4),
 			),
 			'Child2 has its parent\'s collection')
+
+		scene_colls = bpy.context.scene.collection.children
+		assert_that(scene_colls, has_item(coll1), 'Scene collection has coll1')
+		assert_that(scene_colls,
+			not_(has_items(coll2, coll3, coll4)),
+			'Scene collection does not have children of other collections')
 
 	@it('Getting object location')
 	def objectLocationGet():

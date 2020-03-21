@@ -129,7 +129,3 @@ def read_in_mesh(path, name_override=None):
 
 	return mesh
 
-# TODO remove this stuff. It's just here for reference.
-#me = bpy.data.meshes.new('blah')
-#ob = bpy.data.objects.new('blah', me)
-#bpy.context.scene.collection.objects.link(ob)
