@@ -27,8 +27,27 @@ def blenderMockTests():
 		assert_that(bpy.data.meshes, empty())
 		assert_that(bpy.data.objects, empty())
 
-	# TODO error checking for bad test scene
 	# TODO ensure things are actually linked to the scene
+
+	@it('Unused fields are ignored')
+	def usedFieldsIgnored():
+		testutils.set_scene_data({
+			'obj': {
+				'invalid_sub_object': {},
+				'ignored_field': 'hello',
+			}
+		})
+
+		obj = bpy.data.objects.get('obj')
+		assert_that(obj, not_none(), 'Object added despite invalid fields')
+
+	@it('Empty scene data handled gracefully')
+	def emptySceneData():
+		testutils.set_scene_data({})
+		assert_that(bpy.data.collections, empty())
+		assert_that(bpy.data.materials, empty())
+		assert_that(bpy.data.meshes, empty())
+		assert_that(bpy.data.objects, empty())
 
 	@it('Setting and retrieving single object')
 	def singleObjectSet():
