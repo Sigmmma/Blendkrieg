@@ -500,8 +500,27 @@ def blenderMockTests():
 
 	@it('Loading material assignments from mesh file')
 	def meshFaceMaterials():
-		pass
-		# Test that faces have the right material assigned
+		testutils.set_scene_data({
+			'obj': { 'mesh': 'test/testutils/pyramid.dae' }
+		})
+
+		mat1 = bpy.data.materials.get('Pyramid')
+		mat2 = bpy.data.materials.get('Second')
+
+		assert_that(mat1, not_none(), 'First material exists')
+		assert_that(mat2, not_none(), 'First material exists')
+
+		mats = bpy.data.materials
+		p = bpy.data.objects.get('obj').to_mesh().polygons
+
+		# This is the only way I can find to link a polygon's material to a
+		# Material object. This seems weirdly incongruent with the rest of
+		# Blender's API, so maybe I'm missing something?
+		assert_that(mats[p[0].material_index], equal_to(mat1), 'Poly 0 Pyramid material')
+		assert_that(mats[p[1].material_index], equal_to(mat1), 'Poly 1 Pyramid material')
+		assert_that(mats[p[2].material_index], equal_to(mat1), 'Poly 2 Pyramid material')
+		assert_that(mats[p[3].material_index], equal_to(mat1), 'Poly 3 Pyramid material')
+		assert_that(mats[p[4].material_index], equal_to(mat2), 'Poly 4 Second material')
 
 	@it('Setting transforms for mesh')
 	def meshTransforms():
