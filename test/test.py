@@ -44,5 +44,6 @@ if __name__ == '__main__':
 	# will work when run from anywhere.
 	subprocess.run(
 		[blender, '--background', '--python', str(run_pocha)],
-		cwd=str(cur_dir)
+		cwd=str(cur_dir),
+		stderr=subprocess.PIPE # Suppress nonsense from Blender's console
 	)
