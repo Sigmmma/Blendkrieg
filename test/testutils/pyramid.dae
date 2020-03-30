@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.80.75</authoring_tool>
+    </contributor>
+    <created>2020-03-19T21:18:54</created>
+    <modified>2020-03-19T21:18:54</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="Pyramid-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <color sid="diffuse">1 0 0 1</color>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="Second-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <color sid="diffuse">0.007433082 0 1 1</color>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_images/>
+  <library_materials>
+    <material id="Pyramid-material" name="Pyramid">
+      <instance_effect url="#Pyramid-effect"/>
+    </material>
+    <material id="Second-material" name="Second">
+      <instance_effect url="#Second-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Pyramid-mesh" name="Pyramid">
+      <mesh>
+        <source id="Pyramid-mesh-positions">
+          <float_array id="Pyramid-mesh-positions-array" count="15">-1 -1 -1 1 -1 -1 -1 1 -1 1 1 -1 0 0 0</float_array>
+          <technique_common>
+            <accessor source="#Pyramid-mesh-positions-array" count="5" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Pyramid-mesh-normals">
+          <float_array id="Pyramid-mesh-normals-array" count="15">0 0 1 0.6891064 0.6891064 -0.2241984 -0.6891064 0.6891064 -0.2241984 -0.6891064 -0.6891064 -0.2241984 0.6891064 -0.6891064 -0.2241984</float_array>
+          <technique_common>
+            <accessor source="#Pyramid-mesh-normals-array" count="5" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Pyramid-mesh-map-0">
+          <float_array id="Pyramid-mesh-map-0-array" count="32">0.5 0.5 0 0 1 0 0.5 0.5 1 0 1 1 0 1 0.5 0.5 1 1 0 1 0 0 0.5 0.5 1 1 1 0 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Pyramid-mesh-map-0-array" count="16" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Pyramid-mesh-vertices">
+          <input semantic="POSITION" source="#Pyramid-mesh-positions"/>
+        </vertices>
+        <triangles material="Pyramid-material" count="4">
+          <input semantic="VERTEX" source="#Pyramid-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Pyramid-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Pyramid-mesh-map-0" offset="2" set="0"/>
+          <p>4 0 0 3 1 1 2 2 2 4 0 3 2 2 4 0 3 5 1 4 6 4 0 7 0 3 8 1 4 9 3 1 10 4 0 11</p>
+        </triangles>
+        <polylist material="Second-material" count="1">
+          <input semantic="VERTEX" source="#Pyramid-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Pyramid-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Pyramid-mesh-map-0" offset="2" set="0"/>
+          <vcount>4 </vcount>
+          <p>0 3 12 2 2 13 3 1 14 1 4 15</p>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Pyramid" name="Pyramid" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 1</matrix>
+        <instance_geometry url="#Pyramid-mesh" name="Pyramid">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Pyramid-material" target="#Pyramid-material">
+                <bind_vertex_input semantic="MyUV" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+              <instance_material symbol="Second-material" target="#Second-material">
+                <bind_vertex_input semantic="MyUV" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
