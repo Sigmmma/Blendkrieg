@@ -275,6 +275,7 @@ def import_halo1_region_from_jms(jms, *,
 	# Filter the triangles so only the wished regions are retrieved.
 	triangles = tuple(filter(lambda t : t.region in region_filter, jms.tris))
 
+	# Get the material index of each triangle.
 	triangle_materials = tuple(map(lambda t : t.shader, triangles))
 
 	# Reduce the triangles to just their key components.
@@ -329,9 +330,11 @@ def import_halo1_region_from_jms(jms, *,
 	# verts, edges, tris. If () is given for edges Blender will infer them.
 	mesh.from_pydata(vertices, (), triangles)
 
+	# Add all materials from the jms to the mesh.
 	for mat in jms.materials:
 		mesh.materials.append(bpy.data.materials[mat.name])
 
+	# Assign each triangle their corresponding material id.
 	for i, poly in enumerate(mesh.polygons):
 		poly.material_index = triangle_materials[i]
 
