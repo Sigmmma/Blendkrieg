@@ -225,7 +225,7 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 		if armature and parent:
 			scene_marker.parent = armature
 			scene_marker.parent_type = 'BONE'
-			scene_marker.parent_bone = parent.name
+			scene_marker.parent_bone = NODE_NAME_PREFIX+jms.nodes[marker.parent].name
 
 			# The rotation is offset by 0, 0, -90 euler, so we rotate it to
 			# fix that.
