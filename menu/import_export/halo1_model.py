@@ -9,6 +9,7 @@ from ...halo1.model import (
 	import_halo1_nodes_from_jms,
 	import_halo1_markers_from_jms,
 	import_halo1_all_regions_from_jms,
+	import_halo1_model_shader,
 )
 from ...constants import SCALE_MULTIPLIERS
 
@@ -103,6 +104,9 @@ class MT_krieg_ImportHalo1Model(bpy.types.Operator, ImportHelper):
 		# Import markers.
 		import_halo1_markers_from_jms(jms, scale=scale,
 			node_size=self.marker_size, armature=armature, scene_nodes=nodes)
+
+		for mat in jms.materials:
+			import_halo1_model_shader(mat.name)
 
 		import_halo1_all_regions_from_jms(jms, name=name, scale=scale, parent_rig=armature)
 

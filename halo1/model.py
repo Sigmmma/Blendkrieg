@@ -273,7 +273,10 @@ def import_halo1_region_from_jms(jms, *,
 	# Ready the triangles.
 
 	# Filter the triangles so only the wished regions are retrieved.
-	triangles = filter(lambda t : t.region in region_filter, jms.tris)
+	triangles = tuple(filter(lambda t : t.region in region_filter, jms.tris))
+
+	# Get the material index of each triangle.
+	triangle_materials = tuple(map(lambda t : t.shader, triangles))
 
 	# Reduce the triangles to just their key components.
 	triangles = tuple(map(lambda t : (t.v0, t.v1, t.v2), triangles))
@@ -326,6 +329,14 @@ def import_halo1_region_from_jms(jms, *,
 	# Import the verts and tris into the mesh.
 	# verts, edges, tris. If () is given for edges Blender will infer them.
 	mesh.from_pydata(vertices, (), triangles)
+
+	# Add all materials from the jms to the mesh.
+	for mat in jms.materials:
+		mesh.materials.append(bpy.data.materials[mat.name])
+
+	# Assign each triangle their corresponding material id.
+	for i, poly in enumerate(mesh.polygons):
+		poly.material_index = triangle_materials[i]
 
 	# Import loop normals into the mesh.
 	mesh.normals_split_custom_set(loop_normals)
@@ -394,3 +405,7 @@ def import_halo1_all_regions_from_jms(jms, *, name="", scale=1.0, parent_rig=Non
 			region_filter=(i,),
 			parent_rig=parent_rig
 		)
+
+def import_halo1_model_shader(name=""):
+	if bpy.data.materials.get(name, None) is None:
+		bpy.data.materials.new(name=name)
