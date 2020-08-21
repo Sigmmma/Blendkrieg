@@ -102,3 +102,19 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+### Our additions:
+
+# Include the init file in lib but exclude the lib folder.
+!lib/
+lib/*
+!lib/__init__.py
+
+# vim temp files
+*.swp
+
+# Blender backup (?) files
+*.blend1
+
+# Mia's local notes
+notes.txt
