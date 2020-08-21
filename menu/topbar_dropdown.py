@@ -2,6 +2,7 @@ from bpy.utils import register_class, unregister_class
 from bpy.types import Menu, TOPBAR_MT_editor_menus
 
 from .import_export import halo1_model
+from .import_export import halo1_anim
 
 class TOPBAR_MT_krieg(Menu):
 	bl_idname = "TOPBAR_MT_krieg_ext"
@@ -39,6 +40,10 @@ class TOPBAR_MT_krieg_import(Menu):
 		layout.separator()
 
 		# Whatever else:
+		layout.operator(
+			halo1_anim.MT_krieg_ImportHalo1Anim.bl_idname,
+			text="Halo 1 Animation (.model_animations)"
+		)
 
 
 class TOPBAR_MT_krieg_export(Menu):

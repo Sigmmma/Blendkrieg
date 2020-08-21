@@ -16,9 +16,11 @@ from . import lib
 # Import all submodules.
 from .menu import topbar_dropdown
 from .menu.import_export import halo1_model
+from .menu.import_export import halo1_anim
 
 modules = [
 	halo1_model,
+	halo1_anim,
 	topbar_dropdown,
 ]
 
