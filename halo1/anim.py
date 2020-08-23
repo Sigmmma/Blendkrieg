@@ -4,15 +4,24 @@ from math import pi, radians
 
 from reclaimer.hek.defs.antr import antr_def
 from reclaimer.animation.animation_decompilation import extract_model_animations
-
+from reclaimer.animation.jma import JmaAnimationSet,read_jma
 def read_halo1anim(filepath):
-    ''' Takes a halo1 model_animations file and turns them into blender actions'''
+    ''' Generates JmaAnimationSet'''
+
+
     tag = antr_def.build(filepath=filepath)
 
     data = extract_model_animations(tag.data.tagdata,"",write_jma=False)
+    for anim in data:
+        anim.apply_root_node_info_to_states()
     return data
 
+def read_halojma(filepath):
+    jma_string = open(filepath).read()
 
+    jma = read_jma(jma_string,"",filepath)
+    jma.apply_root_node_info_to_states()
+    return [jma]
 def import_animations(animations,scale = 0.03048):
     scene = bpy.context.scene
     target = bpy.context.object
@@ -32,54 +41,30 @@ def import_animations(animations,scale = 0.03048):
         action.use_fake_user = True
         scene.frame_start = 0
         scene.frame_end = len(anim.frames) - 1
+        pose_bones = []
+        for node in anim.nodes:
+            pose_bones.append(target.pose.bones[node.name])
+  
+        for f in range(len(anim.frames)):
+            bpy.context.scene.frame_set(f)
+            for n in range(len(anim.frames[f])):
+                frame = anim.frames[f][n]
+                bone = pose_bones[n]
+                
+                T = Matrix.Translation(Vector((frame.pos_x, frame.pos_y, frame.pos_z))* scale)
+                R = Quaternion((frame.rot_w, frame.rot_i, frame.rot_j, frame.rot_k)).inverted().to_matrix().to_4x4()
+                S = Matrix.Scale(frame.scale ,4,(1,1,1))
         
-        # this is recursively called for each node
-        def ApplyKeyframes(bone):
-            n = anim.get_node_index(bone.name[1:])
-            keys = [ frame[n] for frame in anim.frames ]
-            bone_string = "pose.bones[\"{}\"].".format(bone.name)
-            
-            group = action.groups.new(name=bone.name)
-            curvesLoc = []
-            curvesRot = []
-            for l in range(3):
-                curve = action.fcurves.new(data_path= bone_string + "location", index=l)
-                curve.group = group
-                curvesLoc.append(curve)
-            for r in range(4):
-                curve = action.fcurves.new(data_path= bone_string + "rotation_quaternion", index=r)
-                curve.group = group
-                curvesRot.append(curve)
-            
-            for f,frame in enumerate(keys):
-                print(f,frame)
-                translation = Vector((
-                    frame.pos_x, frame.pos_y, frame.pos_z
-                )) * scale
-                rotation = Quaternion((
-                    frame.rot_w, frame.rot_i, frame.rot_j, frame.rot_k
-                )).normalized().inverted()
-
-                matrix = Matrix.Translation(translation) @ rotation.to_matrix().to_4x4()
-
+        
+                M =  T @ R @ S
                 if not bone.parent:
-                    bone.matrix = matrix
+                    bone.matrix = M
                 else:
-                    bone.matrix = bone.parent.matrix @ matrix
-                for i in range(3):
-                    curvesLoc[i].keyframe_points.add(1)
-                    curvesLoc[i].keyframe_points[-1].co = [f,bone.location[i]]
-                for i in range(4):
-                    curvesRot[i].keyframe_points.add(1)
-                    curvesRot[i].keyframe_points[-1].co = [f,bone.rotation_quaternion[i]]
-            for child in bone.children:
-                ApplyKeyframes(child)
-        #Start keying
-        for bone in target.pose.bones:
-            if not bone.parent:
-                ApplyKeyframes(bone)
-        for fc in action.fcurves:
-            fc.update()
+                    P = bone.parent.matrix
+                    bone.matrix = P @ M
+                bone.keyframe_insert(data_path="location", index=-1)
+                bone.keyframe_insert(data_path="rotation_quaternion", index=-1)
+
     for bone in target.pose.bones:
         bone.location.zero()
         bone.rotation_quaternion.identity()

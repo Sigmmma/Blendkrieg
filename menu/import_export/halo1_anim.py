@@ -6,11 +6,14 @@ from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, 
 
 from ...halo1.anim import (
 	read_halo1anim,
-  import_animations
+	read_halojma,
+  	import_animations
 )
 from ...constants import SCALE_MULTIPLIERS
 
-#@orientation_helper(axis_forward='-Z') Find the right value for this.
+# @orientation_helper(axis_forward='-Z') Find the right value for this.
+
+
 class MT_krieg_ImportHalo1Anim(bpy.types.Operator, ImportHelper):
 	"""
 	The import operator for gbxmodel/jms models.
@@ -24,9 +27,9 @@ class MT_krieg_ImportHalo1Anim(bpy.types.Operator, ImportHelper):
 	# Import-file-dialog settings:
 
 	filename_ext = ".model_animations"
-	filter_glob: StringProperty(
-		default="*.model_animations;*",
-		options={'HIDDEN'},
+	filter_glob: StringProperty( #".jma", ".jmm", ".jmo", ".jmr", ".jmt", ".jmw", ".jmz",
+		default="*.model_animations;*.jma;*.jmm;*.jmo;*.jmr;*.jmt;*.jmw;*.jmz",
+		#options={'HIDDEN'},
 	)
 
 	# Node settings:
@@ -89,10 +92,14 @@ class MT_krieg_ImportHalo1Anim(bpy.types.Operator, ImportHelper):
 			scale = self.scale_float
 		else:
 			raise ValueError('Invalid scale_enum state.')
-
-
-
-		jma = read_halo1anim(self.filepath)
+		
+		jma = None
+		anim_name, ext = os.path.splitext(os.path.basename(self.filepath))
+		if ext == ".model_animations":
+			jma = read_halo1anim(self.filepath)
+		else:
+			jma = read_halojma(self.filepath)
+		print(jma)
 		import_animations(jma,scale)
 		return {'FINISHED'}
 
@@ -141,7 +148,7 @@ def register():
 
 
 def unregister():
-	#Unregister classes in reverse order to avoid any dependency problems.
+	# Unregister classes in reverse order to avoid any dependency problems.
 	for cls in reversed(classes):
 		unregister_class(cls)
 
