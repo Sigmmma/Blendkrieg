@@ -7,7 +7,7 @@ from bpy_extras.io_utils import ImportHelper, ExportHelper, orientation_helper, 
 from ...halo1.anim import (
 	read_halo1anim,
 	read_halojma,
-  	import_animations
+	import_animations
 )
 from ...constants import SCALE_MULTIPLIERS
 
@@ -92,7 +92,7 @@ class MT_krieg_ImportHalo1Anim(bpy.types.Operator, ImportHelper):
 			scale = self.scale_float
 		else:
 			raise ValueError('Invalid scale_enum state.')
-		
+
 		jma = None
 		anim_name, ext = os.path.splitext(os.path.basename(self.filepath))
 		if ext == ".model_animations":
