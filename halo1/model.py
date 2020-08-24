@@ -238,7 +238,7 @@ def import_halo1_markers_from_jms(jms, *, armature=None, scale=1.0, node_size=0.
 			# In Halo, marker positions are relative to the start of their
 			# parent bone. In blender they are relative to the end of the bone.
 			# So, we subtract the length of the bone from the y axis to
-	        # make the final positions match up.
+			# make the final positions match up.
 			scene_marker.location.y -= parent.length
 
 	#TODO: Should this return something?
